@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LTI Catalog — find your teaching tool</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Source+Sans+3:ital,wght@0,300..700;1,400..600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="brand-strip">
+  <div class="left">
+    <div class="brand-mark" aria-hidden="true">L</div>
+    <strong>Learning Technology Solutions</strong>
+  </div>
+  <nav class="nav">
+    <a href="#catalog">Catalog</a>
+    <a href="#">Training</a>
+    <a href="#">Support</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<main data-screen="hero">
+
+  <section class="screen-hero" id="screen-hero">
+    <div class="hero-left">
+      <div class="eyebrow"><span class="dot"></span><span id="hero-count">The 2026 catalog</span></div>
+      <h1 class="headline hero-headline serif">
+        Find the right<br>
+        <em>teaching tool</em><br>
+        for your course.
+      </h1>
+    </div>
+    <div class="hero-right">
+      <p class="hero-lede">
+        Every integration approved for our LMS — with availability across Canvas and
+        Blackboard, and Title II compliance status at a glance. Five questions, sixty
+        seconds, a shortlist made for you.
+      </p>
+      <div class="hero-ctas">
+        <button class="btn crimson" id="btn-start-quiz">Take the quiz →</button>
+        <button class="btn ghost" id="btn-browse">Browse all</button>
+      </div>
+      <div class="hero-bullets">
+        <span><span class="hero-tick">✓</span> Faculty-friendly</span>
+        <span><span class="hero-tick">✓</span> No sign-in required</span>
+        <span><span class="hero-tick">✓</span> Updated this term</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen-quiz" id="screen-quiz">
+    <div class="progress" id="progress"></div>
+
+    <div class="quiz-eyebrow-row">
+      <div class="eyebrow"><span class="dot"></span><span id="q-eyebrow"></span></div>
+      <div class="mono q-counter" id="q-counter"></div>
+    </div>
+
+    <div id="question-slot"></div>
+
+    <div id="leader-slot"></div>
+
+    <div class="quiz-nav">
+      <button class="quiz-back" id="btn-back">← Back</button>
+      <button class="btn crimson" id="btn-continue">Continue →</button>
+      <span class="mono auto-hint" id="auto-hint">↳ Tap any answer to continue</span>
+    </div>
+  </section>
+
+  <section class="screen-results" id="screen-results">
+    <div class="results-head">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>Three matches</div>
+        <h1 class="headline results-headline serif" id="results-summary"></h1>
+      </div>
+      <div class="results-actions">
+        <button class="btn ghost" id="btn-adjust">↺ Adjust answers</button>
+        <button class="btn ghost" id="btn-reset">Start over</button>
+      </div>
+    </div>
+
+    <div class="divider" style="margin: 26px 0;"></div>
+
+    <div class="results-top" id="results-top"></div>
+
+    <div class="results-runners-wrap" id="results-runners-wrap">
+      <div class="eyebrow" style="margin-bottom: 14px;"><span class="dot"></span>Runners-up · also a fit</div>
+      <div class="results-runners" id="results-runners"></div>
+    </div>
+  </section>
+
+  <section class="catalog" id="catalog">
+    <div class="catalog-head">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>Or browse all</div>
+        <h2 class="headline catalog-headline serif">Every tool in the catalog.</h2>
+      </div>
+      <span class="mono catalog-count" id="catalog-count"></span>
+    </div>
+
+    <div class="catalog-toolbar">
+      <div class="catalog-search">
+        <input type="text" id="catalog-search-input" placeholder="Search tools…">
+        <span class="catalog-search-icon">⌕</span>
+      </div>
+      <div class="catalog-pills" id="catalog-pills">
+        <button class="tag" data-lms="all">All platforms</button>
+        <button class="tag" data-lms="canvas">Canvas</button>
+        <button class="tag" data-lms="blackboard">Blackboard</button>
+      </div>
+      <label class="catalog-a11y">
+        <span class="catalog-checkbox" id="catalog-a11y-box"></span>
+        <input type="checkbox" id="catalog-a11y-input" hidden>
+        <span>Title II compliant only</span>
+      </label>
+    </div>
+
+    <table class="catalog-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>What it's for</th>
+          <th class="col-narrow">Canvas</th>
+          <th class="col-narrow">Blackboard</th>
+          <th class="col-narrow">Title II</th>
+        </tr>
+      </thead>
+      <tbody id="catalog-tbody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer class="footnote">
+  <span>© Learning Technology Solutions · catalog updated each term</span>
+  <span class="mono">v.2026.1</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
