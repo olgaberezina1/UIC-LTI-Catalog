@@ -65,10 +65,10 @@
   ];
 
   const AVAIL_LABEL = {
-    yes: "Available",
-    no: "Not in this LMS",
+    yes: "Yes",
+    no: "No",
     retired: "Retired",
-    pending: "Pending vendor",
+    pending: "Waiting for vendor response",
     research: "Researching",
     request: "On request",
     progress: "In progress",
@@ -122,28 +122,6 @@
         { v: null,         t: "Not subject-specific",     s: "General-purpose pick" },
       ],
     },
-    {
-      key: "mode",
-      eyebrow: "Question 04 — Cadence",
-      prompt: "Is this for live class time or between-class work?",
-      multi: false,
-      options: [
-        { v: "sync",  t: "Synchronous",     s: "Happens during the lecture" },
-        { v: "async", t: "Asynchronous",    s: "Students work on their own time" },
-        { v: null,    t: "Both — flexible", s: "Pick something versatile" },
-      ],
-    },
-    {
-      key: "requireA11y",
-      eyebrow: "Question 05 — Accessibility",
-      prompt: "Do you need the tool to be Title II compliant?",
-      sub: "Recommended for any course you publish broadly.",
-      multi: false,
-      options: [
-        { v: true,  t: "Yes — required", s: "Filter out non-compliant tools" },
-        { v: false, t: "Nice to have",   s: "Surface them but don't filter" },
-      ],
-    },
   ];
 
   // Tiny HTML-escape helper for any interpolated text. (Tool data is trusted,
@@ -155,8 +133,9 @@
   }
 
   // ─── 2. Scoring (verbatim port from data.js) ───────────────────
-  function scoreTools({ goals = [], lms = null, requireA11y = false, stakes = null, discipline = null, mode = null, size = null }) {
-    const weights = { goal: 3, lms: 4, a11y: 5, stakes: 2, discipline: 2, mode: 1, size: 1 };
+  function scoreTools({ goals = [], lms = null, stakes = null, discipline = null, size = null }) {
+    const requireA11y = true;
+    const weights = { goal: 3, lms: 4, a11y: 5, stakes: 2, discipline: 2, size: 1 };
     return LTI_TOOLS.map(tool => {
       let score = 0;
       const reasons = [];
@@ -178,9 +157,6 @@
 
       if (discipline && tool.tags.includes(discipline)) { score += weights.discipline; reasons.push(discipline); }
 
-      if (mode === "sync" && tool.tags.includes("sync")) { score += weights.mode; reasons.push("real-time"); }
-      if (mode === "async" && tool.tags.includes("async")) { score += weights.mode; reasons.push("self-paced"); }
-
       if (size === "large" && tool.tags.includes("large-class")) { score += weights.size; reasons.push("large classes"); }
 
       if (tool.bb === "retired" && tool.cv === "retired") score -= 10;
@@ -191,7 +167,6 @@
         (requireA11y ? weights.a11y : 0) +
         (stakes ? weights.stakes : 0) +
         (discipline ? weights.discipline : 0) +
-        (mode ? weights.mode : 0) +
         (size ? weights.size : 0);
 
       const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((score / max) * 100))) : 0;
@@ -207,8 +182,6 @@
       goals: [],
       lms: null,
       discipline: null,
-      mode: null,
-      requireA11y: null,
     },
     catalog: {
       search: '',
@@ -223,13 +196,13 @@
   // ─── 5. Render dispatcher ──────────────────────────────────────
   function render() {
     main.dataset.screen = state.screen;
-    if (state.screen === 'quiz') renderQuiz();
+    if (state.screen === 'finder') renderFinder();
     if (state.screen === 'results') renderResults();
     renderCatalog();
   }
 
   // Stubs filled in by later tasks
-  function renderQuiz() {
+  function renderFinder() {
     const q = QUESTIONS[state.step];
     const total = QUESTIONS.length;
     const value = state.answers[q.key];
@@ -294,24 +267,6 @@
 
     document.getElementById('btn-back').disabled = state.step === 0;
 
-    // Leader slot — Task 6 fills this.
-    renderLeader();
-  }
-
-  function renderLeader() {
-    const slot = document.getElementById('leader-slot');
-    // Hide on Q1
-    if (state.step === 0) { slot.innerHTML = ''; return; }
-    const top = scoreTools(state.answers)[0];
-    if (!top || top.score <= 0) { slot.innerHTML = ''; return; }
-    slot.innerHTML = `
-      <div class="leader">
-        <div class="eyebrow"><span class="dot"></span>Leader so far</div>
-        <span class="name">${esc(top.name)}</span>
-        <span class="pct">${top.pct}% MATCH</span>
-        <span class="tail">Keep going — your shortlist refines with each answer.</span>
-      </div>
-    `;
   }
 
   function querySummary() {
@@ -320,7 +275,6 @@
     if (a.goals && a.goals.length) bits.push(a.goals.slice(0, 2).join(' + '));
     if (a.lms) bits.push(a.lms);
     if (a.discipline) bits.push(a.discipline);
-    if (a.mode) bits.push(a.mode);
     return bits.length ? bits.join(' / ') : 'your course';
   }
 
@@ -347,9 +301,9 @@
           </div>
           <p class="result-desc">${esc(t.desc)}</p>
           <div class="result-avail-row">
-            ${availMarkup(t.cv)}
+            <span class="avail-lms-label">Canvas</span>${availMarkup(t.cv)}
             <span class="sep">·</span>
-            ${availMarkup(t.bb)}
+            <span class="avail-lms-label">Blackboard</span>${availMarkup(t.bb)}
             <span class="sep">·</span>
             <span class="result-t2">Title II: <strong>${t.t2 === 'yes' ? 'Compliant' : t.t2 === 'no' ? 'No' : '—'}</strong></span>
           </div>
@@ -360,9 +314,6 @@
             </div>` : ''}
         </div>
         <div class="result-pct-col">
-          <div class="result-pct">${t.pct}<span class="sign">%</span></div>
-          <div class="result-pct-label">Match</div>
-          <div class="result-pct-bar"><div style="width: ${t.pct}%"></div></div>
           <button class="btn ghost">Tool details →</button>
         </div>
       </div>
@@ -389,7 +340,6 @@
         <div class="runner-card">
           <div class="runner-head">
             <div class="runner-name">${esc(t.name)}</div>
-            <div class="runner-pct">${t.pct}%</div>
           </div>
           <div class="runner-desc">${esc(t.desc.length > 110 ? t.desc.slice(0, 110) + '…' : t.desc)}</div>
         </div>
@@ -428,8 +378,8 @@
 
     // Table body
     document.getElementById('catalog-tbody').innerHTML = rows.map(t => {
-      const t2cell = t.t2 === 'yes' ? availMarkup('yes')
-                   : t.t2 === 'no'  ? availMarkup('no')
+      const t2cell = t.t2 === 'yes' ? '<span class="avail yes">Yes</span>'
+                   : t.t2 === 'no'  ? '<span class="avail no">No</span>'
                    : '<span class="em-dash">—</span>';
       return `
         <tr>
@@ -460,7 +410,7 @@
   }
 
   function resetAnswers() {
-    state.answers = { goals: [], lms: null, discipline: null, mode: null, requireA11y: null };
+    state.answers = { goals: [], lms: null, discipline: null };
     state.step = 0;
   }
 
@@ -469,8 +419,6 @@
     goals: new Set(['polling','discussion','annotation','practice','high-stakes','writing','video','lab']),
     lms: new Set(['canvas','blackboard']),
     discipline: new Set(['stem','science','humanities','business','health']),
-    mode: new Set(['sync','async']),
-    a11y: new Set(['yes','nice']),
   };
 
   function syncHash() {
@@ -479,9 +427,6 @@
     if (a.goals && a.goals.length) parts.push('goals=' + a.goals.join(','));
     if (a.lms) parts.push('lms=' + a.lms);
     if (a.discipline) parts.push('discipline=' + a.discipline);
-    if (a.mode) parts.push('mode=' + a.mode);
-    if (a.requireA11y === true)  parts.push('a11y=yes');
-    if (a.requireA11y === false) parts.push('a11y=nice');
     if (state.screen === 'results') parts.push('view=results');
     const newHash = parts.length ? '#' + parts.join('&') : '';
     if (location.hash !== newHash) {
@@ -490,23 +435,19 @@
   }
 
   function emptyAnswers() {
-    return { goals: [], lms: null, discipline: null, mode: null, requireA11y: null };
+    return { goals: [], lms: null, discipline: null };
   }
 
   function hasAnyAnswer(a) {
     return (a.goals && a.goals.length > 0)
       || a.lms !== null
-      || a.discipline !== null
-      || a.mode !== null
-      || a.requireA11y !== null;
+      || a.discipline !== null;
   }
 
   function firstUnansweredStep(a) {
     if (!a.goals || a.goals.length === 0) return 0;
     if (a.lms === null) return 1;
     if (a.discipline === null) return 2;
-    if (a.mode === null) return 3;
-    if (a.requireA11y === null) return 4;
     return QUESTIONS.length - 1;
   }
 
@@ -528,11 +469,6 @@
     }
     if (params.lms && VALID.lms.has(params.lms)) answers.lms = params.lms;
     if (params.discipline && VALID.discipline.has(params.discipline)) answers.discipline = params.discipline;
-    if (params.mode && VALID.mode.has(params.mode)) answers.mode = params.mode;
-    if (params.a11y && VALID.a11y.has(params.a11y)) {
-      answers.requireA11y = params.a11y === 'yes';
-    }
-
     const view = params.view === 'results' ? 'results' : null;
     return { answers, view };
   }
@@ -543,7 +479,7 @@
     if (view === 'results' && hasAnyAnswer(answers)) {
       state.screen = 'results';
     } else if (hasAnyAnswer(answers)) {
-      state.screen = 'quiz';
+      state.screen = 'finder';
       state.step = firstUnansweredStep(answers);
     } else {
       state.screen = 'hero';
@@ -595,16 +531,16 @@
       `The 2026 catalog · ${LTI_TOOLS.length} integrations`;
 
     // Hero buttons
-    document.getElementById('btn-start-quiz').addEventListener('click', () => {
+    document.getElementById('btn-start-finder').addEventListener('click', () => {
       state.step = 0;
-      goToScreen('quiz');
+      goToScreen('finder');
     });
     document.getElementById('btn-browse').addEventListener('click', () => {
       document.getElementById('catalog').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
-    // Quiz option click delegation
-    document.getElementById('screen-quiz').addEventListener('click', (e) => {
+    // Finder option click delegation
+    document.getElementById('screen-finder').addEventListener('click', (e) => {
       const opt = e.target.closest('[data-opt]');
       if (!opt) return;
       const key = opt.dataset.key;
@@ -623,7 +559,7 @@
 
     document.getElementById('btn-adjust').addEventListener('click', () => {
       state.step = 0;
-      goToScreen('quiz');
+      goToScreen('finder');
     });
 
     document.getElementById('btn-reset').addEventListener('click', () => {

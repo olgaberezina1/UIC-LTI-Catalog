@@ -41,12 +41,12 @@ main > section { padding: 60px 8vw; }
 main .catalog { padding-top: 60px; padding-bottom: 80px; border-top: 1px solid var(--ink); }
 
 /* Screen toggle — show only the section matching data-screen */
-main[data-screen="hero"]    > .screen-quiz,
+main[data-screen="hero"]    > .screen-finder,
 main[data-screen="hero"]    > .screen-results,
-main[data-screen="quiz"]    > .screen-hero,
-main[data-screen="quiz"]    > .screen-results,
+main[data-screen="finder"]  > .screen-hero,
+main[data-screen="finder"]  > .screen-results,
 main[data-screen="results"] > .screen-hero,
-main[data-screen="results"] > .screen-quiz {
+main[data-screen="results"] > .screen-finder {
   display: none;
 }
 
@@ -186,8 +186,8 @@ main[data-screen="results"] > .screen-quiz {
 .hero-bullets { margin-top: 22px; font-size: 12px; color: var(--ink-3); display: flex; gap: 16px; flex-wrap: wrap; }
 .hero-tick { color: var(--crimson); font-weight: 700; }
 
-/* Quiz */
-.screen-quiz {
+/* Finder */
+.screen-finder {
   padding: 40px 8vw 80px;
   display: flex; flex-direction: column;
   min-height: 600px;
@@ -204,7 +204,7 @@ main[data-screen="results"] > .screen-quiz {
 .progress > div.is-past { background: var(--crimson); }
 .progress > div.is-current { background: var(--ink); }
 
-.quiz-eyebrow-row { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+.finder-eyebrow-row { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
 .q-counter { font-size: 11px; color: var(--ink-3); }
 
 .q-prompt {
@@ -271,33 +271,21 @@ main[data-screen="results"] > .screen-quiz {
 .option-card .opt-sub { font-size: 12.5px; opacity: 0.65; }
 .option-card .tick { font-size: 14px; }
 
-.quiz-nav {
+.finder-nav {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 36px; padding-top: 18px;
   border-top: 1px solid var(--line);
 }
-.quiz-back {
+.finder-back {
   background: none; border: none; padding: 0;
   color: var(--ink-2);
   font-family: var(--sans);
   font-size: 13px;
   letter-spacing: 0.04em;
 }
-.quiz-back:disabled { color: var(--line); cursor: default; }
+.finder-back:disabled { color: var(--line); cursor: default; }
 .auto-hint { font-size: 12px; color: var(--ink-3); }
 
-.leader {
-  margin-top: 32px;
-  padding: 14px 18px;
-  background: var(--paper-2);
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  max-width: 720px;
-  border: 1px solid var(--line);
-}
-.leader .eyebrow { margin: 0; }
-.leader .name { font-family: var(--serif); font-size: 18px; font-weight: 500; }
-.leader .pct { font-family: var(--mono); font-size: 10px; color: var(--crimson); font-weight: 700; letter-spacing: 0.08em; }
-.leader .tail { font-size: 12px; color: var(--ink-3); margin-left: auto; }
 
 /* Results */
 .screen-results { padding: 44px 8vw 80px; }
@@ -350,8 +338,9 @@ main[data-screen="results"] > .screen-quiz {
 }
 .result-desc { margin: 10px 0 14px; color: var(--ink-2); max-width: 580px; font-size: 14px; line-height: 1.5; }
 .result-card.is-hero .result-desc { font-size: 15px; }
-.result-avail-row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
-.result-avail-row .sep { color: var(--line); }
+.result-avail-row { display: flex; gap: 6px 10px; flex-wrap: wrap; align-items: center; }
+.result-avail-row .sep { color: var(--line); margin: 0 4px; }
+.avail-lms-label { font-size: 11px; color: var(--ink-3); }
 .result-t2 { font-size: 12px; color: var(--ink-2); }
 .result-why { margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .result-why .why-label {
@@ -360,20 +349,6 @@ main[data-screen="results"] > .screen-quiz {
 }
 .result-why .tag { font-size: 10.5px; }
 .result-pct-col { text-align: right; }
-.result-pct {
-  font-family: var(--serif); font-size: 50px; font-weight: 400;
-  line-height: 1; letter-spacing: -0.02em;
-}
-.result-card.is-hero .result-pct { font-size: 64px; }
-.result-pct .sign { color: var(--ink-3); }
-.result-card.is-hero .result-pct .sign { font-size: 22px; }
-.result-pct .sign { font-size: 18px; }
-.result-pct-label {
-  font-size: 10px; color: var(--ink-3);
-  text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px;
-}
-.result-pct-bar { height: 3px; background: var(--paper-2); margin-top: 14px; }
-.result-pct-bar > div { height: 100%; background: var(--crimson); transition: width .8s ease; }
 .result-card .btn { margin-top: 14px; font-size: 11px; padding: 8px 14px; }
 
 .results-runners-wrap { margin-top: 40px; }
@@ -383,7 +358,6 @@ main[data-screen="results"] > .screen-quiz {
 .runner-card { padding: 14px 18px; background: white; border: 1px solid var(--line); }
 .runner-head { display: flex; justify-content: space-between; align-items: baseline; }
 .runner-name { font-family: var(--serif); font-size: 17px; font-weight: 500; }
-.runner-pct { font-family: var(--mono); font-size: 11px; color: var(--crimson); font-weight: 600; }
 .runner-desc { font-size: 12.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.45; }
 
 /* Catalog */
@@ -474,14 +448,12 @@ main[data-screen="results"] > .screen-quiz {
   .result-card.is-hero .result-rank { font-size: 40px; }
   .result-name { font-size: 20px; }
   .result-card.is-hero .result-name { font-size: 26px; }
-  .result-pct { font-size: 40px; }
-  .result-card.is-hero .result-pct { font-size: 52px; }
 }
 
 @media (max-width: 640px) {
   main > section { padding: 32px 5vw; }
   .screen-hero { padding-top: 36px; padding-bottom: 32px; }
-  .screen-quiz { padding-top: 28px; padding-bottom: 56px; }
+  .screen-finder { padding-top: 28px; padding-bottom: 56px; }
   .screen-results { padding-top: 28px; padding-bottom: 56px; }
 
   .results-head { flex-direction: column; align-items: stretch; }
@@ -495,7 +467,6 @@ main[data-screen="results"] > .screen-quiz {
   }
   .result-rank, .result-card.is-hero .result-rank { font-size: 28px; }
   .result-top-pick { margin-top: 4px; }
-  .result-pct-col { text-align: left; }
 
   .catalog-toolbar { gap: 10px; }
   .catalog-search { flex: 1 1 100%; }
@@ -530,7 +501,7 @@ main[data-screen="results"] > .screen-quiz {
   /* Tool cell (which has its own internal structure) — skip the label */
   .catalog-table td[data-label="Tool"]::before { content: none; }
 
-  .quiz-nav { flex-wrap: wrap; gap: 12px; }
+  .finder-nav { flex-wrap: wrap; gap: 12px; }
   .auto-hint { width: 100%; text-align: right; }
 }
 
