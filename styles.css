@@ -139,7 +139,7 @@ main[data-screen="results"] > .screen-finder {
 .card { background: white; border: 1px solid var(--line); }
 
 /* Availability pip */
-.avail { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-2); }
+.avail { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2); }
 .avail .pip { width: 8px; height: 8px; border-radius: 50%; background: var(--no); display: inline-block; }
 .avail.yes .pip { background: var(--yes); }
 .avail.no .pip { background: var(--no-strong); }
@@ -400,13 +400,13 @@ main[data-screen="results"] > .screen-finder {
 
 .catalog-table {
   width: 100%; border-collapse: collapse;
-  font-family: var(--sans); font-size: 13.5px;
+  font-family: var(--sans); font-size: 15px;
 }
 .catalog-table thead tr { text-align: left; border-bottom: 1px solid var(--ink); }
 .catalog-table th {
   padding: 12px 12px 10px 0;
   font-family: var(--sans);
-  font-size: 10px; font-weight: 600;
+  font-size: 11px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--ink);
 }
@@ -415,7 +415,7 @@ main[data-screen="results"] > .screen-finder {
 .catalog-a11y { cursor: pointer; }
 .catalog-table tbody tr { border-bottom: 1px solid var(--line); vertical-align: top; }
 .catalog-table td { padding: 14px 12px 14px 0; }
-.catalog-name { font-family: var(--serif); font-size: 16px; font-weight: 500; }
+.catalog-name { font-family: var(--serif); font-size: 18px; font-weight: 500; }
 .catalog-tags {
   font-family: var(--mono); font-size: 10px;
   color: var(--ink-3); letter-spacing: 0.06em;
