@@ -46,7 +46,7 @@
     { name: "Perusall", desc: "A social annotation platform that allows students to collaboratively read and discuss academic texts, PDFs, and other course materials with integrated discussions and analytics.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","reading","annotation","async","humanities","writing"] },
     { name: "Photo Roster", desc: "Canvas Photo Roster displays profile photos next to student names throughout the LMS to help instructors and staff more easily recognize and engage with learners. It improves classroom familiarity and supports identity verification in remote or face-to-face teaching.", bb: "yes", cv: "yes", t2: "yes", tags: ["attendance","engagement"] },
     { name: "Piazza", desc: "A Q&A platform designed for academic courses that facilitates student-instructor and peer-to-peer communication and knowledge sharing.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","qa","async","large-class","stem"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c3acad21-4a04-4593-a2e2-b36b00fee801" },
-    { name: "Poll Everywhere", desc: "A real-time audience response system that enables interactive polling, quizzes, and surveys during lectures and presentations.", bb: "yes", cv: "no", t2: "yes", tags: ["polling","engagement","sync"] },
+    { name: "Poll Everywhere", desc: "A real-time audience response system that enables interactive polling, quizzes, and surveys during lectures and presentations.", bb: "yes", cv: "unlicensed", t2: "yes", tags: ["polling","engagement","sync"] },
     { name: "Redshelf", desc: "A digital textbook platform specifically configured for University of Illinois Chicago that provides access to e-textbooks and educational materials.", bb: "yes", cv: "retired", t2: "yes", tags: ["textbook","publisher"] },
     { name: "Respondus LockDown Browser", desc: "LockDown Browser restricts students' computer functions during online exams, preventing actions like copying, screen switching, or visiting other websites. It is often paired with monitoring tools to ensure test integrity.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","high-stakes","integrity","proctoring"] },
     { name: "Runestone", desc: "An interactive textbook platform primarily used for computer science courses that combines reading materials with executable code examples.", bb: "yes", cv: "pending", t2: "—", tags: ["textbook","cs","coding","stem"] },
@@ -80,6 +80,7 @@
   const AVAIL_LABEL = {
     yes: "Yes",
     no: "No",
+    unlicensed: "Not licensed, unavailable.",
     retired: "Retired",
     pending: "Waiting for vendor response",
     research: "Researching",
