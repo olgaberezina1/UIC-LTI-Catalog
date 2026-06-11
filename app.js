@@ -394,16 +394,16 @@
       const t2cell = t.t2 === 'yes' ? '<span class="avail yes">Yes</span>'
                    : t.t2 === 'no'  ? '<span class="avail no">No</span>'
                    : '<span class="em-dash">—</span>';
+      const videoLink = t.video
+        ? '<a href="' + t.video + '" target="_blank" rel="noopener" class="catalog-video-link">&#9654; Watch walkthrough</a>'
+        : '';
       return `
         <tr>
           <td data-label="Tool">
             <div class="catalog-name">${esc(t.name)}</div>
             <div class="catalog-tags">${t.tags.slice(0, 2).map(esc).join(' · ')}</div>
           </td>
-          <td class="catalog-desc" data-label="What it's for">
-            ${esc(t.desc)}
-            ${t.video ? `<a href="${t.video}" target="_blank" rel="noopener" class="catalog-video-link">▶ Watch walkthrough</a>` : ''}
-          </td>
+          <td class="catalog-desc" data-label="What it's for">${esc(t.desc)}${videoLink}</td>
           <td data-label="Canvas">${availMarkup(t.cv)}</td>
           <td data-label="Blackboard">${availMarkup(t.bb)}</td>
           <td data-label="Title II">${t2cell}</td>
