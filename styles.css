@@ -425,7 +425,7 @@ main[data-screen="results"] > .screen-finder {
   text-transform: uppercase; margin-top: 2px;
 }
 .catalog-desc { color: var(--ink-2); line-height: 1.45; padding-right: 36px; max-width: 520px; }
-.catalog-video-link { display: inline-block; margin-top: 6px; font-size: 12px; color: var(--crimson); text-decoration: none; font-family: var(--sans); }
+.catalog-video-link { display: block; margin-top: 6px; font-size: 12px; color: var(--crimson); text-decoration: none; font-family: var(--sans); }
 .catalog-video-link:hover { text-decoration: underline; }
 .catalog-table .em-dash { color: var(--ink-3); }
 
