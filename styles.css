@@ -139,7 +139,7 @@ main[data-screen="results"] > .screen-finder {
 .card { background: white; border: 1px solid var(--line); }
 
 /* Availability pip */
-.avail { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink-2); }
+.avail { display: inline-flex; align-items: center; gap: 7px; font-size: 16px; color: var(--ink-2); }
 .avail .pip { width: 8px; height: 8px; border-radius: 50%; background: var(--no); display: inline-block; }
 .avail.yes .pip { background: var(--yes); }
 .avail.no .pip { background: var(--no-strong); }
