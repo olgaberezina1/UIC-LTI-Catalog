@@ -70,7 +70,7 @@
     retired: "Retired",
     pending: "Waiting for vendor response",
     research: "Researching",
-    request: "On request",
+    request: "Available per request",
     progress: "In progress",
     na: "N/A",
     "—": "—",
