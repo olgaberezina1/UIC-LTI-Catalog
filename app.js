@@ -313,9 +313,6 @@
               ${t.reasons.slice(0, 5).map(r => `<span class="tag">${esc(r)}</span>`).join('')}
             </div>` : ''}
         </div>
-        <div class="result-pct-col">
-          <button class="btn ghost">Tool details →</button>
-        </div>
       </div>
     `;
   }
