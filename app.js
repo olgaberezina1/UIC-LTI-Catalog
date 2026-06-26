@@ -93,7 +93,7 @@
         { v: "high-stakes", t: "Sit a high-stakes exam",s: "Proctored or secure testing" },
         { v: "writing",     t: "Write & get feedback",  s: "Originality, grading, essays" },
         { v: "video",       t: "Engage with video",     s: "Lecture capture, captioned media" },
-        { v: "lab",         t: "Run a lab or sim",      s: "Virtual labs, science protocols" },
+        { v: "lab",         t: "Run a lab or simulation", s: "Virtual labs, science protocols" },
       ],
     },
     {
