@@ -174,7 +174,7 @@ main[data-screen="results"] > .screen-finder {
 }
 .hero-headline em {
   font-style: italic;
-  color: #ff8099;
+  color: var(--crimson);
 }
 .screen-hero .eyebrow { color: rgba(255,255,255,0.6); }
 .screen-hero .eyebrow .dot { background: var(--crimson); }
