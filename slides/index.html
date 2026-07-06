@@ -72,6 +72,9 @@
 .reveal section.slide-navy .deck-foot,
 .reveal section.slide-navy .eyebrow { color: rgba(255,255,255,0.65); }
 .reveal section.slide-navy .deck-title em { color: #ff8099; }
+
+.reveal section.slide-navy .bullets li { color: rgba(255,255,255,0.85); }
+.reveal section.slide-navy .mono { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
 </style>
 </head>
 <body>
@@ -257,6 +260,40 @@
       <aside class="notes">
         Zero build steps, zero dependencies, three files. That simplicity is the point —
         anyone can maintain it.
+      </aside>
+    </section>
+
+    <!-- Slide 11 — Live & maintainable -->
+    <section data-slide="live">
+      <p class="eyebrow">In production</p>
+      <h2 class="slide-h">Live, and easy to <em>keep</em> alive.</h2>
+      <div class="two-col">
+        <p class="lead">The catalog is live on GitHub Pages. Updating it is a one-line change.</p>
+        <ul class="bullets">
+          <li>Edit the <span class="mono">LTI_TOOLS</span> array, then push</li>
+          <li>GitHub Pages redeploys automatically</li>
+          <li><span class="mono">PROJECT.md</span> documents the whole system</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        The handoff to the next maintainer is real: one documented array, one push. No pipeline
+        to understand.
+      </aside>
+    </section>
+
+    <!-- Slide 12 — Closing -->
+    <section data-slide="close" data-background-color="#001E62" class="slide-navy">
+      <p class="eyebrow">Recap</p>
+      <h1 class="deck-title">Designed, built, and <em>shipped</em>.</h1>
+      <p class="deck-sub">Claude Design &rarr; Claude Code &rarr; live for faculty.</p>
+      <ul class="bullets" style="margin-top:0.8em;">
+        <li>Next: usage analytics &amp; more walkthrough videos</li>
+        <li>Next: periodic data refresh from the spreadsheet</li>
+      </ul>
+      <p class="deck-foot">olgaberezina1.github.io/UIC-LTI-Catalog</p>
+      <aside class="notes">
+        To recap: a prototype designed in Claude Design, rebuilt and iterated live in Claude Code,
+        now serving faculty. Thank you — questions?
       </aside>
     </section>
 
