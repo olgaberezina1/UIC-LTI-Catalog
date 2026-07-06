@@ -72,6 +72,20 @@
 
 .reveal section.slide-navy .bullets li { color: rgba(255,255,255,0.85); }
 .reveal section.slide-navy .mono { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+
+/* Product screenshots */
+.reveal .shot { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 12px 34px rgba(0,30,98,0.18); }
+.reveal .shot-wrap { margin-top: 0.5em; }
+.reveal .two-col.shot-col { grid-template-columns: 0.82fr 1.18fr; gap: 1.4em; align-items: center; }
+.reveal .shot-cap { font-size: 0.5em; color: var(--muted); margin-top: 0.5em; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Terminal block */
+.reveal .term { font-family: ui-monospace, Menlo, monospace; font-size: 0.58em; background: #0e1a36; color: #e6ebf5; border-radius: 8px; padding: 0.9em 1.1em; line-height: 1.7; box-shadow: 0 12px 34px rgba(0,30,98,0.2); overflow-x: auto; margin-top: 0.3em; }
+.reveal .term .c { color: #ff8099; }
+.reveal .term .o { color: #9fb3d1; }
+.reveal .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em; margin-top: 0.6em; font-family: ui-monospace, Menlo, monospace; font-size: 0.62em; }
+.reveal .flow .step { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.35em 0.7em; color: var(--navy); }
+.reveal .flow .arr { color: var(--red); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -128,6 +142,19 @@
       <aside class="notes">
         Two ways in: the finder for people who don't know what they want, and the full
         catalog for people who do. 57 tools, 10 with Panopto walkthrough videos.
+      </aside>
+    </section>
+
+    <!-- Slide — Catalog screenshot -->
+    <section data-slide="catalog-shot">
+      <p class="eyebrow">Browse all</p>
+      <h2 class="slide-h">Search, filter, and scan availability.</h2>
+      <div class="shot-wrap">
+        <img class="shot" src="img/catalog.png" alt="The catalog table listing tools with Canvas, Blackboard, and Title II availability">
+      </div>
+      <aside class="notes">
+        This is the live catalog: search, filter by platform, and each tool shows its Canvas /
+        Blackboard availability and Title II status at a glance.
       </aside>
     </section>
 
@@ -189,16 +216,19 @@
     <section data-slide="finder">
       <p class="eyebrow">Design decisions</p>
       <h2 class="slide-h">The finder got <em>simpler</em>.</h2>
-      <div class="two-col">
+      <div class="two-col shot-col">
         <div>
           <p class="lead">It began as a five-question quiz. We cut it to the three questions that actually change the answer.</p>
+          <ul class="bullets">
+            <li>5 questions &rarr; 3 (pedagogy, LMS, discipline)</li>
+            <li>Title II dropped — now always required</li>
+            <li>&ldquo;Take the Quiz&rdquo; &rarr; &ldquo;Find My Tool&rdquo;</li>
+            <li>Removed the % match and the leaderboard</li>
+          </ul>
         </div>
-        <ul class="bullets">
-          <li>5 questions &rarr; 3 (pedagogy, LMS, discipline)</li>
-          <li>Title II dropped — now always required</li>
-          <li>&ldquo;Take the Quiz&rdquo; &rarr; &ldquo;Find My Tool&rdquo;</li>
-          <li>Removed the % match and the leaderboard</li>
-        </ul>
+        <div class="shot-wrap">
+          <img class="shot" src="img/finder.png" alt="The Find My Tool finder showing question one with option cards">
+        </div>
       </div>
       <aside class="notes">
         Every removed question was a question that didn't change the recommendation. Title II
@@ -228,13 +258,18 @@
     <section data-slide="brand">
       <p class="eyebrow">The finish</p>
       <h2 class="slide-h">Made it look like <em>UIC</em>.</h2>
-      <div class="two-col">
-        <p class="lead">A retheme to match learning.uic.edu — the same navy, cardinal red, and clean white you're looking at right now.</p>
-        <ul class="bullets">
-          <li>UIC Navy <span class="mono">#001E62</span> hero &amp; header</li>
-          <li>Cardinal Red <span class="mono">#D50032</span> accents</li>
-          <li>Navy catalog table headers, white body</li>
-        </ul>
+      <div class="two-col shot-col">
+        <div>
+          <p class="lead">A retheme to match learning.uic.edu — the same navy, cardinal red, and clean white you're looking at right now.</p>
+          <ul class="bullets">
+            <li>UIC Navy <span class="mono">#001E62</span> hero &amp; header</li>
+            <li>Cardinal Red <span class="mono">#D50032</span> accents</li>
+            <li>Navy catalog table headers, white body</li>
+          </ul>
+        </div>
+        <div class="shot-wrap">
+          <img class="shot" src="img/hero.png" alt="The UIC-branded catalog hero in navy and cardinal red">
+        </div>
       </div>
       <aside class="notes">
         The prototype had a dark editorial look. The final pass aligned it with the official
@@ -275,6 +310,82 @@
       <aside class="notes">
         The handoff to the next maintainer is real: one documented array, one push. No pipeline
         to understand.
+      </aside>
+    </section>
+
+    <!-- Slide — Hosted on GitHub Pages -->
+    <section data-slide="hosting">
+      <p class="eyebrow">How it ships</p>
+      <h2 class="slide-h">Hosted on <em>GitHub Pages</em>.</h2>
+      <div class="two-col">
+        <p class="lead">The three static files live in a GitHub repository. GitHub Pages serves them straight to the web — no server to run, no build pipeline to configure.</p>
+        <ul class="bullets">
+          <li>Repo <span class="mono">github.com/olgaberezina1/UIC-LTI-Catalog</span></li>
+          <li>Live at <span class="mono">olgaberezina1.github.io/UIC-LTI-Catalog</span></li>
+          <li>Free hosting, HTTPS, custom-domain ready</li>
+          <li>Every push to <span class="mono">main</span> is live in about a minute</li>
+        </ul>
+      </div>
+      <aside class="notes">
+        GitHub Pages turns the repo into a website. Because the site is just static files, there's
+        no server or CI to maintain — a push to the main branch is the deploy.
+      </aside>
+    </section>
+
+    <!-- Slide — Git was the workflow -->
+    <section data-slide="git">
+      <p class="eyebrow">Version control</p>
+      <h2 class="slide-h">Every change is a <em>commit</em>.</h2>
+      <div class="two-col">
+        <div>
+          <p class="lead">Git recorded every step. Each small change is a labeled commit with a full history you can read, diff, or roll back.</p>
+          <ul class="bullets">
+            <li>30+ commits, each one reversible</li>
+            <li>Readable diffs — data lives in one array</li>
+            <li>The history <em>is</em> the changelog</li>
+          </ul>
+        </div>
+        <div class="term">
+<span class="o">$</span> <span class="c">git commit -m</span> "Remove all 13 retired tools"<br>
+<span class="o">$</span> <span class="c">git commit -m</span> "Redesign theme to match UIC brand"<br>
+<span class="o">$</span> <span class="c">git commit -m</span> "Make 'teaching tool' hero text red"<br>
+<span class="o">$</span> <span class="c">git push</span><br>
+<span class="o">&nbsp;&nbsp; main -&gt; main&nbsp; (live in ~1 min)</span>
+        </div>
+      </div>
+      <aside class="notes">
+        Nothing was edited "in place" and lost. Every decision on this project is a commit with a
+        message, so the project's history reads like a narrated changelog.
+      </aside>
+    </section>
+
+    <!-- Slide — How Claude uses git -->
+    <section data-slide="claude-git">
+      <p class="eyebrow">AI + version control</p>
+      <h2 class="slide-h">Claude runs <em>git</em> directly.</h2>
+      <div class="two-col">
+        <p class="lead">Claude Code doesn't just suggest code — it edits the files, runs git in the terminal, writes the commit message, and pushes. You describe the intent; it does the mechanics.</p>
+        <ul class="bullets">
+          <li>Edits files, then <span class="mono">git add</span> / <span class="mono">commit</span> / <span class="mono">push</span></li>
+          <li>Writes clear, conventional commit messages</li>
+          <li>Reviews its own diff before pushing</li>
+          <li>Can branch, revert, and inspect history</li>
+        </ul>
+      </div>
+      <div class="flow">
+        <span class="step">You: "make the headers bigger"</span>
+        <span class="arr">&rarr;</span>
+        <span class="step">edit styles.css</span>
+        <span class="arr">&rarr;</span>
+        <span class="step">git commit</span>
+        <span class="arr">&rarr;</span>
+        <span class="step">git push</span>
+        <span class="arr">&rarr;</span>
+        <span class="step">live</span>
+      </div>
+      <aside class="notes">
+        This whole deck and the site were built this way: a sentence of intent, and Claude handles
+        the edit, the commit message, and the push — with git as the safety net the whole time.
       </aside>
     </section>
 
