@@ -455,6 +455,22 @@ main[data-screen="results"] > .screen-finder {
 .catalog-video-link:hover { text-decoration: underline; }
 .catalog-table .em-dash { color: var(--ink-3); }
 
+/* Pagination */
+.catalog-pager {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 28px; flex-wrap: wrap;
+}
+.catalog-pager button {
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border: 1px solid var(--line);
+  background: white; color: var(--ink);
+  transition: background .14s ease, color .14s ease, border-color .14s ease;
+}
+.catalog-pager button:hover:not(:disabled):not(.is-on) { border-color: var(--ink); }
+.catalog-pager .pager-num { min-width: 40px; }
+.catalog-pager .pager-num.is-on { background: var(--ink); color: white; border-color: var(--ink); }
+.catalog-pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ─── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 840px) {

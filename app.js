@@ -3,63 +3,64 @@
 
   // ─── 1. Catalog data (verbatim port from data.js) ──────────────
   const LTI_TOOLS = [
-    // ── Active tools ────────────────────────────────────────────────
     { name: "Acadly", desc: "A comprehensive classroom management platform that combines attendance tracking, live polling, assignments, and communication tools for enhanced student engagement.", bb: "yes", cv: "yes", t2: "yes", tags: ["engagement","polling","attendance","async","sync"] },
-    { name: "ACS Lab Safety", desc: "A lab safety training and assessment platform specifically designed for University of Illinois Chicago to ensure compliance with laboratory safety protocols and regulations.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","science","compliance","training"] },
+    { name: "ACS Lab Safety UIC", desc: "A lab safety training and assessment platform specifically designed for University of Illinois Chicago to ensure compliance with laboratory safety protocols and regulations.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","science","compliance","training"] },
     { name: "Aleks", desc: "An adaptive learning platform that uses artificial intelligence to provide personalized math and science instruction with detailed progress tracking.", bb: "yes", cv: "retired", t2: "no", tags: ["adaptive","math","science","stem","practice","publisher"] },
     { name: "Alexander Street", desc: "A digital library platform that provides access to streaming video content, including documentaries, performances, and educational videos for academic use.", bb: "yes", cv: "yes", t2: "yes", tags: ["video","content","humanities","library"] },
-    { name: "Ally", desc: "Ally helps improve the accessibility of digital course materials by providing instructors with feedback and guidance on content usability, while automatically generating alternative formats for learners. It supports inclusive teaching practices and helps institutions meet accessibility and compliance standards.", bb: "yes", cv: "no", t2: "yes", tags: ["accessibility","content","compliance"] },
+    { name: "Ally", desc: "Ally helps improve the accessibility of digital course materials by providing instructors with feedback and guidance on content usability, while automatically generating alternative formats for learners. It supports inclusive teaching practices and helps institutions meet accessibility and compliance standards.", bb: "—", cv: "—", t2: "—", tags: ["accessibility","content","compliance"] },
     { name: "Anthology Course Evaluations", desc: "A course evaluation system specifically configured for University of Illinois Chicago to collect student feedback and institutional assessments.", bb: "yes", cv: "pending", t2: "yes", tags: ["evaluation","feedback","survey"] },
+    { name: "Api Packback", desc: "An AI-powered discussion platform that encourages critical thinking through structured online discussions and peer engagement.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","ai","engagement","async","writing"] },
     { name: "Apollo Codio", desc: "A cloud-based development environment and curriculum platform designed for computer science education with integrated coding exercises and assessments.", bb: "yes", cv: "pending", t2: "yes", tags: ["coding","stem","cs","practice","ide"] },
-    { name: "Canvas Attendance", desc: "Canvas Attendance (Roll Call) allows instructors to quickly record student attendance during live sessions, either manually or through student check-ins. It integrates attendance data with Canvas's gradebook and analytics to support participation tracking.", bb: "no", cv: "yes", t2: "yes", tags: ["attendance","engagement","sync"] },
+    { name: "Canvas Attendance", desc: "Canvas Attendance (Roll Call) allows instructors to quickly record student attendance during live sessions, either manually or through student check-ins. It integrates attendance data with Canvas’s gradebook and analytics to support participation tracking.", bb: "no", cv: "yes", t2: "yes", tags: ["attendance","engagement","sync"] },
     { name: "Canvas Intelligent Insights", desc: "Canvas Intelligent Insights uses AI-driven analytics to identify student engagement patterns, predict risk factors, and support data-informed teaching decisions. It provides dashboards and recommendations to enhance learning outcomes.", bb: "na", cv: "yes", t2: "yes", tags: ["analytics","ai","success","at-risk"] },
     { name: "Canvas Moderated Grading", desc: "Moderated Canvas refers to instructor or admin roles that have enhanced oversight capabilities (such as TA moderation, content approval workflows, or proctoring support) within Canvas courses. It enables structured control over student interactions, submissions, and discussion moderation.", bb: "no", cv: "yes", t2: "yes", tags: ["grading","assessment","high-stakes"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=392074dc-b258-4dd5-a318-b3c2015c2f81" },
-    { name: "Canvas Studio", desc: "An interactive video platform to share video and audio content, while also supporting commenting, collaboration, and quizzing directly on media timelines. It allows threaded discussions, inline feedback, peer-to-peer interaction, and automatic captioning, all centrally managed with robust analytics that track engagement for deeper insight into learning outcomes.", bb: "no", cv: "yes", t2: "yes", tags: ["video","engagement","discussion","captioning","async"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=010a32e8-b48c-455c-b880-b3680147a91b" },
+    { name: "Canvas Studio", desc: "An interactive video platform to share video and audio content, while also supporting commenting, collaboration, and quizzing directly on media timelines. It allows threaded discussions, inline feedback, peer-to-peer interaction, and automatic captioning, all centrally managed with robust analytics that track engagement for deeper insight into learning outcomes. Canvas Studio Introduction", bb: "no", cv: "yes", t2: "yes", tags: ["video","engagement","discussion","captioning","async"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=010a32e8-b48c-455c-b880-b3680147a91b" },
+    { name: "CanvasBadgr", desc: "Canvas Badges (Badgr) lets instructors issue digital badges and micro-credentials for skills and achievements, which learners collect in a shareable backpack.", bb: "—", cv: "—", t2: "—", tags: ["badges","credentials","skills"] },
     { name: "Cengage Gateway", desc: "An integrated learning platform that provides access to Cengage's digital textbooks, homework assignments, and assessment tools with grade passback capabilities.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","textbook","homework","practice"] },
-    { name: "ClassRanked", desc: "ClassRanked provides data-driven insights into course difficulty, student satisfaction, and instructor performance using verified student feedback. It helps students make informed course selections and supports departments with trend analysis.", bb: "no", cv: "research", t2: "—", tags: ["evaluation","analytics","feedback"] },
+    { name: "ClassRanked", desc: "ClassRanked provides data-driven insights into course difficulty, student satisfaction, and instructor performance using verified student feedback. It helps students make informed course selections and supports departments with trend analysis.", bb: "no", cv: "contract", t2: "—", tags: ["evaluation","analytics","feedback"] },
     { name: "Echo360", desc: "A lecture capture and video management platform that enables recording, streaming, and sharing of educational video content.", bb: "yes", cv: "yes", t2: "yes", tags: ["video","capture","async"] },
     { name: "Elsevier (Evolve)", desc: "A comprehensive educational platform for health sciences that provides interactive learning resources, assessments, and digital textbooks for medical and nursing education.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","health","textbook","practice"] },
-    { name: "ExamSoft", desc: "ExamSoft is a secure offline exam platform that supports high-stakes assessments, analytics, and question tagging. It ensures controlled testing environments and provides detailed performance reporting.", bb: "yes", cv: "research", t2: "yes", tags: ["assessment","high-stakes","integrity","proctoring"] },
-    { name: "Expert TA", desc: "An online homework and assessment system primarily used for physics courses, providing automated grading and detailed feedback for STEM subjects.", bb: "yes", cv: "yes", t2: "yes", tags: ["stem","practice","homework","assessment"] },
+    { name: "ExamSoft Enterprise", desc: "ExamSoft is a secure offline exam platform that supports high-stakes assessments, analytics, and question tagging. It ensures controlled testing environments and provides detailed performance reporting.", bb: "yes", cv: "migrating", t2: "yes", tags: ["assessment","high-stakes","integrity","proctoring"] },
     { name: "Follett Discovery", desc: "Follett Discovery allows instructors to search, adopt, and link course materials such as textbooks and digital resources directly within their course environment. It streamlines access to required materials and supports inclusive access and bookstore integrations.", bb: "yes", cv: "no", t2: "—", tags: ["textbook","publisher"] },
-    { name: "Gradescope", desc: "An AI-assisted grading platform that streamlines the process of grading assignments, exams, and programming projects with automated feedback and analytics.", bb: "yes", cv: "yes", t2: "yes", tags: ["grading","assessment","stem","ai","writing"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c7451af0-39a4-4167-8c1d-b36b012f039b" },
+    { name: "Gradescope", desc: "An AI-assisted grading platform that streamlines the process of grading assignments, exams, and programming projects with automated feedback and analytics. Gradescope Linking Assignments", bb: "yes", cv: "yes", t2: "yes", tags: ["grading","assessment","stem","ai","writing"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c7451af0-39a4-4167-8c1d-b36b012f039b" },
     { name: "Holscience", desc: "A science education platform that provides interactive simulations and virtual laboratory experiences for science courses.", bb: "yes", cv: "progress", t2: "—", tags: ["science","stem","simulation","lab"] },
     { name: "iClicker", desc: "iClicker enables real-time polling, quizzes, and attendance tracking to increase student engagement during live classes. Students can respond via mobile app or physical clickers.", bb: "yes", cv: "yes", t2: "yes", tags: ["polling","engagement","attendance","sync","large-class"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=8bba0d48-cd9a-4370-96e3-b43201411c63" },
     { name: "ILP Grading", desc: "ILP Grading (Instructor Learning Platform Grading) provides advanced grading workflows and rubrics for instructors to evaluate student work within Canvas. It supports streamlined scoring, feedback delivery, and integration with the Canvas gradebook.", bb: "no", cv: "yes", t2: "yes", tags: ["grading","assessment"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d8c14696-939c-4623-94c3-b3a10166c826" },
-    { name: "InQuizitive (Norton)", desc: "An adaptive quiz platform that provides personalized practice questions and assessments based on Norton's educational content.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","practice","humanities"] },
+    { name: "InQuizitive (W.W. Norton)", desc: "An adaptive quiz platform that provides personalized practice questions and assessments based on Norton's educational content.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","practice","humanities"] },
+    { name: "iThenticate", desc: "iThenticate is a plagiarism detection tool that compares submitted documents against a large database of scholarly publications, web content, and other sources to identify potential text similarity. It is primarily used by researchers, faculty, publishers, and graduate programs to promote originality and maintain academic integrity.", bb: "standalone", cv: "standalone_mig", t2: "—", tags: ["integrity","writing","research"] },
     { name: "Kortex", desc: "Digital textbook and course materials platform that provides students with access to over 400,000 digital textbooks from more than 700 publishers, including Pearson, McGraw-Hill, and Wiley.", bb: "no", cv: "pending", t2: "yes", tags: ["textbook","publisher","library"] },
     { name: "Labflow", desc: "A digital laboratory notebook and workflow management system designed for science courses to track experiments and lab activities.", bb: "yes", cv: "retired", t2: "no", tags: ["science","lab","stem"] },
-    { name: "LinkedIn Learning", desc: "The production version of LinkedIn's professional development and skills training platform for educational institutions.", bb: "yes", cv: "yes", t2: "yes", tags: ["video","skills","async","professional"] },
     { name: "Lingco", desc: "Lingco is a language learning platform that helps instructors create and deliver interactive language activities, assessments, and multimedia content. It supports course management, student engagement, and grade synchronization while providing tools designed specifically for language instruction.", bb: "no", cv: "yes", t2: "yes", tags: ["writing","humanities"] },
-    { name: "Lucid", desc: "Lucid's LTI integration allows students and instructors to create, edit, and collaborate on diagrams, flowcharts, wireframes, and digital whiteboards directly within Canvas. It supports interactive visual assignments, group work, and embedded diagrams inside course content.", bb: "no", cv: "yes", t2: "yes", tags: ["collaboration","visual","whiteboard","group"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=629d8b59-42da-44d9-b857-b3a6016ab679" },
+    { name: "LinkedIn Learning", desc: "The production version of LinkedIn's professional development and skills training platform for educational institutions.", bb: "yes", cv: "yes", t2: "yes", tags: ["video","skills","async","professional"] },
+    { name: "Lucid", desc: "Lucid’s LTI integration allows students and instructors to create, edit, and collaborate on diagrams, flowcharts, wireframes, and digital whiteboards directly within Canvas. It supports interactive visual assignments, group work, and embedded diagrams inside course content. Lucid Integration", bb: "no", cv: "yes", t2: "yes", tags: ["collaboration","visual","whiteboard","group"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=629d8b59-42da-44d9-b857-b3a6016ab679" },
     { name: "Matlab", desc: "MATLAB is a powerful numerical computing environment used for data analysis, modeling, simulation, and visualization. It integrates with LMS platforms to enable assignment submissions, automated grading, and interactive learning modules in STEM courses.", bb: "yes", cv: "retired", t2: "no", tags: ["stem","math","engineering","computing"] },
-    { name: "McGraw Hill Connect", desc: "A digital learning platform that provides adaptive learning technology, assignments, and assessments integrated with McGraw Hill's educational content.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","textbook","homework"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=a87a3cab-ef47-49f0-a177-b369012eac93" },
-    { name: "MNV / Macmillan Achieve", desc: "A gateway service for accessing educational content and resources through MNV Technology's platform.", bb: "yes", cv: "request", t2: "yes", tags: ["publisher","textbook"] },
+    { name: "McGraw Hill Connect", desc: "A digital learning platform that provides adaptive learning technology, assignments, and assessments integrated with McGraw Hill's educational content. McGraw Integration", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","textbook","homework"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=a87a3cab-ef47-49f0-a177-b369012eac93" },
+    { name: "MNV Gateway (Macmillan Achieve)", desc: "A gateway service for accessing educational content and resources through MNV Technology's platform.", bb: "yes", cv: "request", t2: "yes", tags: ["publisher","textbook"] },
     { name: "myBusinessCourse", desc: "An online learning platform that provides business education content, including accounting, finance, and business courses with integrated assessments.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","business","practice"] },
     { name: "MyOpenMath", desc: "An open-source online mathematics homework system that provides customizable problem sets and automatic grading for math courses.", bb: "yes", cv: "yes", t2: "yes", tags: ["math","stem","practice","open-source","homework"] },
-    { name: "OpenOChem", desc: "An open-source organic chemistry learning platform that provides practice problems and educational resources for chemistry students.", bb: "yes", cv: "pending", t2: "—", tags: ["science","chemistry","stem","practice","open-source"] },
-    { name: "Packback", desc: "An AI-powered discussion platform that encourages critical thinking through structured online discussions and peer engagement.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","ai","engagement","async","writing"] },
-    { name: "Panopto", desc: "A comprehensive video platform for education that provides lecture capture, video management, and interactive video learning capabilities.", bb: "yes", cv: "yes", t2: "yes", tags: ["video","capture","async"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4006194c-3a9e-4339-93b1-b367013674af" },
+    { name: "OpenOChem", desc: "An open-source organic chemistry learning platform that provides practice problems and educational resources for chemistry students", bb: "yes", cv: "pending", t2: "—", tags: ["science","chemistry","stem","practice","open-source"] },
+    { name: "Panopto", desc: "A comprehensive video platform for education that provides lecture capture, video management, and interactive video learning capabilities. How to Embed Panopto Videos", bb: "yes", cv: "yes", t2: "yes", tags: ["video","capture","async"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4006194c-3a9e-4339-93b1-b367013674af" },
     { name: "Panorama", desc: "Panorama provides data-driven insights into student engagement, well-being, and sense of belonging through surveys and analytics. It helps instructors and administrators identify trends, support at-risk students, and inform student success initiatives.", bb: "no", cv: "yes", t2: "—", tags: ["analytics","success","survey","at-risk"] },
     { name: "Parchment Digital Badges", desc: "Parchment enables institutions to issue digital badges and certificates that track skills and achievements. It integrates with learning platforms to automate credential awarding and learner progress visualization.", bb: "yes", cv: "yes", t2: "yes", tags: ["badges","credentials","skills"] },
     { name: "Pearson Access", desc: "A comprehensive digital learning platform that provides access to Pearson's educational content, assessments, and adaptive learning tools.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","textbook","homework"] },
     { name: "Perusall", desc: "A social annotation platform that allows students to collaboratively read and discuss academic texts, PDFs, and other course materials with integrated discussions and analytics.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","reading","annotation","async","humanities","writing"] },
     { name: "Photo Roster", desc: "Canvas Photo Roster displays profile photos next to student names throughout the LMS to help instructors and staff more easily recognize and engage with learners. It improves classroom familiarity and supports identity verification in remote or face-to-face teaching.", bb: "yes", cv: "yes", t2: "yes", tags: ["attendance","engagement"] },
-    { name: "Piazza", desc: "A Q&A platform designed for academic courses that facilitates student-instructor and peer-to-peer communication and knowledge sharing.", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","qa","async","large-class","stem"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c3acad21-4a04-4593-a2e2-b36b00fee801" },
+    { name: "Piazza", desc: "A Q&A platform designed for academic courses that facilitates student-instructor and peer-to-peer communication and knowledge sharing Piazza Introduction", bb: "yes", cv: "yes", t2: "yes", tags: ["discussion","qa","async","large-class","stem"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c3acad21-4a04-4593-a2e2-b36b00fee801" },
     { name: "Poll Everywhere", desc: "A real-time audience response system that enables interactive polling, quizzes, and surveys during lectures and presentations.", bb: "yes", cv: "unlicensed", t2: "yes", tags: ["polling","engagement","sync"] },
     { name: "Redshelf", desc: "A digital textbook platform specifically configured for University of Illinois Chicago that provides access to e-textbooks and educational materials.", bb: "yes", cv: "retired", t2: "yes", tags: ["textbook","publisher"] },
-    { name: "Respondus LockDown Browser", desc: "LockDown Browser restricts students' computer functions during online exams, preventing actions like copying, screen switching, or visiting other websites. It is often paired with monitoring tools to ensure test integrity.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","high-stakes","integrity","proctoring"] },
+    { name: "Respondus LockDown Browser", desc: "LockDown Browser restricts students’ computer functions during online exams, preventing actions like copying, screen switching, or visiting other websites. It is often paired with monitoring tools to ensure test integrity.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","high-stakes","integrity","proctoring"] },
     { name: "Runestone", desc: "An interactive textbook platform primarily used for computer science courses that combines reading materials with executable code examples.", bb: "yes", cv: "pending", t2: "—", tags: ["textbook","cs","coding","stem"] },
     { name: "SAGE Vantage", desc: "An integrated learning platform that combines SAGE Publications' content with adaptive learning technology and assessment tools.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","humanities","textbook"] },
     { name: "SCORM", desc: "SCORM is a standardized format for packaging interactive learning modules that can be imported into LMS platforms. It ensures compatibility, tracking, and communication between learning content and the LMS.", bb: "yes", cv: "yes", t2: "yes", tags: ["content"] },
     { name: "Soft Chalk Cloud", desc: "A content authoring and delivery platform that allows instructors to create interactive online lessons and educational content.", bb: "yes", cv: "yes", t2: "yes", tags: ["content","async"] },
     { name: "Stukent", desc: "A digital marketing education platform that provides simulations, courseware, and hands-on learning experiences for marketing courses.", bb: "yes", cv: "yes", t2: "yes", tags: ["business","simulation","practice","publisher"] },
-    { name: "Top Hat", desc: "Top Hat is an interactive teaching platform that supports polling, quizzes, attendance, discussions, and digital textbook delivery. It enhances student engagement during live or asynchronous learning through mobile devices.", bb: "yes", cv: "retired", t2: "no", tags: ["polling","engagement","attendance","textbook"] },
-    { name: "Turning Technologies (PointSolutions)", desc: "An interactive student response system that enables real-time polling, quizzes, and classroom engagement activities to enhance learning and participation.", bb: "yes", cv: "yes", t2: "yes", tags: ["polling","engagement","sync"] },
-    { name: "Turnitin", desc: "Turnitin checks student submissions for originality by comparing them to extensive databases of academic and web content. It also offers grading tools, feedback features, and writing analytics.", bb: "no", cv: "yes", t2: "yes", tags: ["integrity","writing","grading","humanities"] },
-    { name: "Virtual Machine", desc: "The Campus Virtual Machine provides instructors, TAs, and instructional designers with access to a stable, on-campus computing environment for running advanced LMS features, media tools, and integrations. It serves as a reliable alternative when a user's local hardware or network connection cannot support high-performance tasks.", bb: "na", cv: "na", t2: "yes", tags: [] },
+    { name: "The Expertta (Expert TA)", desc: "An online homework and assessment system primarily used for physics courses, providing automated grading and detailed feedback for STEM subjects.", bb: "yes", cv: "yes", t2: "yes", tags: ["stem","practice","homework","assessment"] },
+    { name: "Top hat", desc: "Top Hat is an interactive teaching platform that supports polling, quizzes, attendance, discussions, and digital textbook delivery. It enhances student engagement during live or asynchronous learning through mobile devices.", bb: "yes", cv: "retired", t2: "no", tags: ["polling","engagement","attendance","textbook"] },
+    { name: "Turning Technologies (PointSolutions)", desc: "An interactive student response system that enables real-time polling, quizzes, and classroom engagement activities to enhance learning and participation", bb: "yes", cv: "yes", t2: "yes", tags: ["polling","engagement","sync"] },
+    { name: "TurnitIn", desc: "Turnitin checks student submissions for originality by comparing them to extensive databases of academic and web content. It also offers grading tools, feedback features, and writing analytics.", bb: "no", cv: "yes", t2: "yes", tags: ["integrity","writing","grading","humanities"] },
+    { name: "Virtual Machine", desc: "The Campus Virtual Machine provides instructors, TAs, and instructional designers with access to a stable, on-campus computing environment for running advanced LMS features, media tools, and integrations. It serves as a reliable alternative when a user’s local hardware or network connection cannot support high-performance tasks.", bb: "—", cv: "—", t2: "yes", tags: [] },
     { name: "Wiley (WileyPLUS)", desc: "An integrated teaching and learning platform that combines Wiley's educational content with adaptive learning technology and assessment tools.", bb: "yes", cv: "yes", t2: "yes", tags: ["publisher","adaptive","textbook","homework"] },
-    { name: "Zoom", desc: "A video conferencing platform integration that enables virtual meetings, webinars, and online classroom sessions within the LMS environment.", bb: "yes", cv: "yes", t2: "yes", tags: ["sync","collaboration"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=0bf11245-7727-4f25-b10f-b39a01238fc1" },
+    { name: "Zoom", desc: "A video conferencing platform integration that enables virtual meetings, webinars, and online classroom sessions within the LMS environment. Zoom Canvas Setup", bb: "yes", cv: "yes", t2: "yes", tags: ["sync","collaboration"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=0bf11245-7727-4f25-b10f-b39a01238fc1" },
     { name: "Zybooks", desc: "An interactive online textbook platform that combines reading materials with hands-on coding exercises and animations for computer science and engineering courses.", bb: "yes", cv: "yes", t2: "yes", tags: ["textbook","cs","coding","stem","practice"] },
   ];
 
@@ -72,6 +73,10 @@
     research: "Researching",
     request: "Available per request",
     progress: "In progress",
+    contract: "Contract not yet approved",
+    migrating: "Migrating — Aug 15",
+    standalone: "Standalone",
+    standalone_mig: "Standalone — migrating Aug 15",
     na: "N/A",
     "—": "—",
   };
@@ -187,8 +192,12 @@
       search: '',
       lms: 'all',
       onlyA11y: false,
+      page: 0,
     },
   };
+
+  // How many catalog rows per page (59 tools → 2 pages).
+  const CATALOG_PAGE_SIZE = 30;
 
   // ─── 4. DOM cache (filled on init) ─────────────────────────────
   let main;
@@ -281,9 +290,10 @@
   function availMarkup(stateVal) {
     const label = AVAIL_LABEL[stateVal] || stateVal || '—';
     let cls = 'yes';
-    if (stateVal === 'no') cls = 'no';
+    if (stateVal === 'no' || stateVal === 'unlicensed') cls = 'no';
     else if (stateVal === 'retired') cls = 'retired';
-    else if (['pending', 'research', 'request', 'progress', 'na'].includes(stateVal)) cls = 'warn';
+    else if (['pending', 'research', 'request', 'progress', 'na', 'contract', 'migrating', 'standalone', 'standalone_mig'].includes(stateVal)) cls = 'warn';
+    else if (stateVal === '—' || !stateVal) cls = '';
     return `<span class="avail ${cls}"><span class="pip"></span>${esc(label)}</span>`;
   }
 
@@ -359,6 +369,12 @@
   function renderCatalog() {
     const rows = rowsForCatalog();
 
+    // Paginate — clamp the current page in case filters shrank the result set.
+    const pageCount = Math.max(1, Math.ceil(rows.length / CATALOG_PAGE_SIZE));
+    if (state.catalog.page > pageCount - 1) state.catalog.page = pageCount - 1;
+    const page = state.catalog.page;
+    const pageRows = rows.slice(page * CATALOG_PAGE_SIZE, (page + 1) * CATALOG_PAGE_SIZE);
+
     document.getElementById('catalog-count').textContent =
       `${rows.length} OF ${LTI_TOOLS.length} SHOWN`;
 
@@ -374,7 +390,7 @@
     document.getElementById('catalog-a11y-input').checked = state.catalog.onlyA11y;
 
     // Table body
-    document.getElementById('catalog-tbody').innerHTML = rows.map(t => {
+    document.getElementById('catalog-tbody').innerHTML = pageRows.map(t => {
       const t2cell = t.t2 === 'yes' ? '<span class="avail yes">Yes</span>'
                    : t.t2 === 'no'  ? '<span class="avail no">No</span>'
                    : '<span class="em-dash">—</span>';
@@ -394,6 +410,25 @@
         </tr>
       `;
     }).join('');
+
+    renderPager(pageCount, page);
+  }
+
+  function renderPager(pageCount, page) {
+    const pager = document.getElementById('catalog-pager');
+    if (pageCount <= 1) { pager.innerHTML = ''; return; }
+    let html = `<button class="pager-btn" data-page="${page - 1}" ${page === 0 ? 'disabled' : ''}>← Prev</button>`;
+    for (let i = 0; i < pageCount; i++) {
+      html += `<button class="pager-num${i === page ? ' is-on' : ''}" data-page="${i}">${i + 1}</button>`;
+    }
+    html += `<button class="pager-btn" data-page="${page + 1}" ${page === pageCount - 1 ? 'disabled' : ''}>Next →</button>`;
+    pager.innerHTML = html;
+  }
+
+  function goToCatalogPage(n) {
+    state.catalog.page = n;
+    renderCatalog();
+    document.getElementById('catalog').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ─── 6. State helpers ──────────────────────────────────────────
@@ -569,6 +604,7 @@
 
     document.getElementById('catalog-search-input').addEventListener('input', (e) => {
       state.catalog.search = e.target.value;
+      state.catalog.page = 0;
       renderCatalog();
     });
 
@@ -576,6 +612,7 @@
       const btn = e.target.closest('[data-lms]');
       if (!btn) return;
       state.catalog.lms = btn.dataset.lms;
+      state.catalog.page = 0;
       renderCatalog();
     });
 
@@ -583,7 +620,14 @@
     // <label> (visual square OR text) toggle the filter consistently.
     document.getElementById('catalog-a11y-input').addEventListener('change', (e) => {
       state.catalog.onlyA11y = e.target.checked;
+      state.catalog.page = 0;
       renderCatalog();
+    });
+
+    document.getElementById('catalog-pager').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-page]');
+      if (!btn || btn.disabled) return;
+      goToCatalogPage(Number(btn.dataset.page));
     });
 
     hydrateFromHash();
