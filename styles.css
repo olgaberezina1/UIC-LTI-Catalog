@@ -37,6 +37,8 @@ button { font: inherit; cursor: pointer; }
 main { min-height: 100vh; display: flex; flex-direction: column; }
 main > section { padding: 60px 8vw; }
 main .catalog { padding-top: 60px; padding-bottom: 80px; border-top: 1px solid var(--line); }
+main .failed-review { padding-top: 60px; padding-bottom: 90px; border-top: 1px solid var(--line); }
+.failed-review-body { margin-top: 20px; }
 
 /* Screen toggle — show only the section matching data-screen */
 main[data-screen="hero"]    > .screen-finder,
