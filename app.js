@@ -128,11 +128,6 @@
     },
   ];
 
-  // LTI integrations that were reviewed and not approved for use.
-  const FAILED_REVIEW = [
-    { name: "Carolina Distance Learning" },
-  ];
-
   // Tiny HTML-escape helper for any interpolated text. (Tool data is trusted,
   // but escape anyway so we don't accidentally break with an `&` in copy.)
   function esc(s) {
@@ -212,16 +207,6 @@
     if (state.screen === 'finder') renderFinder();
     if (state.screen === 'results') renderResults();
     renderCatalog();
-    renderFailedReview();
-  }
-
-  function renderFailedReview() {
-    document.getElementById('failed-review-body').innerHTML = FAILED_REVIEW.map(t => `
-      <div class="failed-review-row">
-        <div class="catalog-name">${esc(t.name)}</div>
-        ${t.reason ? `<div class="catalog-desc">${esc(t.reason)}</div>` : ''}
-      </div>
-    `).join('');
   }
 
   // Stubs filled in by later tasks
