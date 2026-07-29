@@ -148,48 +148,56 @@ main[data-screen="results"] > .screen-finder {
 .avail.warn .pip { background: var(--warn); }
 .avail.retired .pip { background: var(--no); opacity: .5; }
 
-/* Footer */
+/* Footer — sized and colored to match uic.edu / teaching.uic.edu exactly */
 .site-footer { font-family: var(--sans); }
+.footer-inner { max-width: 1204px; margin: 0 auto; padding: 0 20px; }
 
 .footer-contact {
   background: #e7e7e7;
-  padding: 40px 8vw;
-  display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap;
+  color: #252525;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
-.footer-wordmark { flex-shrink: 0; }
-.footer-wordmark svg { height: 34px; width: auto; display: block; }
+.footer-contact .footer-inner {
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 40px;
+}
+.footer-wordmark { flex: 0 0 275px; max-width: 275px; }
+.footer-wordmark svg { width: 100%; height: auto; display: block; }
+.footer-contact-info { flex: 1 1 320px; }
 .footer-contact-info h2 {
-  margin: 0 0 10px; font-size: 13px; font-weight: 900;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink);
+  margin: 0 0 10px; font-size: 16px; font-weight: 900;
+  text-transform: uppercase; color: var(--ink);
 }
-.footer-contact-info h3 { margin: 0 0 4px; font-size: 16px; color: var(--ink); }
-.footer-contact-info a { color: var(--ink); text-decoration: none; font-size: 14px; }
-.footer-contact-info a:hover { text-decoration: underline; }
-.footer-site-line {
-  margin: 14px 0 0; font-size: 12px; color: var(--ink-3);
-}
+.footer-contact-info h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.footer-contact-info a { color: #252525; text-decoration: none; font-size: 14px; }
+.footer-contact-info a:hover, .footer-contact-info a:focus { text-decoration: underline; }
+.footer-site-line { margin: 20px 0 0; font-size: 12px; color: #6b6b6b; }
 .footer-site-line .mono { letter-spacing: 0.1em; }
 
 .footer-uic-menu {
   background: var(--ink); color: white;
-  padding: 15px 8vw 0;
+  padding: 13px 0;
   font-size: 14px;
 }
 .footer-uic-menu ul { list-style: none; margin: 0; padding: 0; }
 .footer-uic-menu li { display: inline-block; margin-right: 20px; line-height: 2.2; }
+.footer-uic-menu li:first-child { font-weight: 700; }
 .footer-uic-menu li a { color: white; text-decoration: none; }
 .footer-uic-menu li a:hover, .footer-uic-menu li a:focus { text-decoration: underline; }
 
 .footer-legal {
   background: var(--ink); color: white;
-  padding: 6px 8vw 20px;
+  padding: 15px 0;
   font-size: 12px; line-height: 2.2;
-  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
 }
+.footer-legal .footer-inner { display: flex; flex-wrap: wrap; }
+.footer-legal .site-copyright { flex: 1 0 auto; }
 .footer-legal .pipe-separator { margin: 0 5px 0 3px; }
-.footer-legal a { color: white; }
+.footer-legal a { color: white; text-decoration: none; }
 .footer-legal a:hover, .footer-legal a:focus { text-decoration: underline; }
-.campuses-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px 16px; flex-wrap: wrap; }
+.campuses-list { list-style: none; margin: 0; padding: 0; }
+.campuses-list li { display: inline-block; }
+.campuses-list li + li::before { content: '|'; margin: 0 5px 0 3px; }
 .campuses-list a { text-decoration: none; }
 .campuses-list a:hover, .campuses-list a:focus { text-decoration: underline; }
 
@@ -544,9 +552,9 @@ main[data-screen="results"] > .screen-finder {
   .screen-finder { padding-top: 28px; padding-bottom: 56px; }
   .screen-results { padding-top: 28px; padding-bottom: 56px; }
 
-  .footer-contact { padding: 32px 5vw; gap: 24px; }
-  .footer-uic-menu { padding: 15px 5vw 0; }
-  .footer-legal { padding: 6px 5vw 20px; }
+  .footer-contact { padding-top: 32px; padding-bottom: 32px; }
+  .footer-contact .footer-inner { gap: 24px; }
+  .footer-wordmark { flex-basis: 200px; max-width: 200px; }
 
   .results-head { flex-direction: column; align-items: stretch; }
   .results-runners { grid-template-columns: 1fr; }
