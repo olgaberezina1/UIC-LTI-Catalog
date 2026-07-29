@@ -149,13 +149,49 @@ main[data-screen="results"] > .screen-finder {
 .avail.retired .pip { background: var(--no); opacity: .5; }
 
 /* Footer */
-.footnote {
-  background: var(--ink); color: white;
-  padding: 32px 8vw;
-  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px;
-  font-size: 12px; opacity: .9;
+.site-footer { font-family: var(--sans); }
+
+.footer-contact {
+  background: #e7e7e7;
+  padding: 40px 8vw;
+  display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap;
 }
-.footnote .mono { letter-spacing: 0.1em; }
+.footer-wordmark { flex-shrink: 0; }
+.footer-wordmark svg { height: 34px; width: auto; display: block; }
+.footer-contact-info h2 {
+  margin: 0 0 10px; font-size: 13px; font-weight: 900;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink);
+}
+.footer-contact-info h3 { margin: 0 0 4px; font-size: 16px; color: var(--ink); }
+.footer-contact-info a { color: var(--ink); text-decoration: none; font-size: 14px; }
+.footer-contact-info a:hover { text-decoration: underline; }
+.footer-site-line {
+  margin: 14px 0 0; font-size: 12px; color: var(--ink-3);
+}
+.footer-site-line .mono { letter-spacing: 0.1em; }
+
+.footer-uic-menu {
+  background: var(--ink); color: white;
+  padding: 15px 8vw 0;
+  font-size: 14px;
+}
+.footer-uic-menu ul { list-style: none; margin: 0; padding: 0; }
+.footer-uic-menu li { display: inline-block; margin-right: 20px; line-height: 2.2; }
+.footer-uic-menu li a { color: white; text-decoration: none; }
+.footer-uic-menu li a:hover, .footer-uic-menu li a:focus { text-decoration: underline; }
+
+.footer-legal {
+  background: var(--ink); color: white;
+  padding: 6px 8vw 20px;
+  font-size: 12px; line-height: 2.2;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
+}
+.footer-legal .pipe-separator { margin: 0 5px 0 3px; }
+.footer-legal a { color: white; }
+.footer-legal a:hover, .footer-legal a:focus { text-decoration: underline; }
+.campuses-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px 16px; flex-wrap: wrap; }
+.campuses-list a { text-decoration: none; }
+.campuses-list a:hover, .campuses-list a:focus { text-decoration: underline; }
 
 /* ─── Hero — UIC navy banner ──────────────────────────────────── */
 .screen-hero {
@@ -507,6 +543,10 @@ main[data-screen="results"] > .screen-finder {
   .screen-hero { padding-top: 36px; padding-bottom: 32px; }
   .screen-finder { padding-top: 28px; padding-bottom: 56px; }
   .screen-results { padding-top: 28px; padding-bottom: 56px; }
+
+  .footer-contact { padding: 32px 5vw; gap: 24px; }
+  .footer-uic-menu { padding: 15px 5vw 0; }
+  .footer-legal { padding: 6px 5vw 20px; }
 
   .results-head { flex-direction: column; align-items: stretch; }
   .results-runners { grid-template-columns: 1fr; }
