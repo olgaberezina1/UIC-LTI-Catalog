@@ -2,7 +2,7 @@
 
 ## Overview
 
-A static website listing all Learning Technology Integration (LTI) tools approved for use at the University of Illinois Chicago (UIC). Instructors can use the **Find My Tool** guided finder to get personalized recommendations, or browse the full catalog table directly.
+A static website listing all LTI tools and apps approved for use at the University of Illinois Chicago (UIC). Instructors can use the **Find My Tool** guided finder to get personalized recommendations, or browse the full catalog table directly.
 
 **Live site:** https://olgaberezina1.github.io/UIC-LTI-Catalog
 **GitHub repo:** https://github.com/olgaberezina1/UIC-LTI-Catalog
