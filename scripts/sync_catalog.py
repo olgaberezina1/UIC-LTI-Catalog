@@ -90,3 +90,33 @@ def row_to_tool(row):
         tool["video"] = url
         tool["videoTitle"] = cell(row, COL_VIDEO)
     return tool
+
+
+def build_catalog(rows):
+    """Filter, convert, de-duplicate and sort every sheet row.
+
+    Returns (tools, warnings). Warnings are non-fatal notes for the operator.
+    """
+    tools = []
+    warnings = []
+    seen = set()
+
+    for row in rows:
+        if not should_keep(row):
+            continue
+        tool = row_to_tool(row)
+        if tool["name"] in seen:
+            warnings.append(f"duplicate row for {tool['name']} — keeping the first")
+            continue
+        seen.add(tool["name"])
+        tools.append(tool)
+
+    tools.sort(key=lambda t: t["name"].lower())
+
+    if len(tools) < MIN_TOOLS:
+        raise SyncError(
+            f"only {len(tools)} tools survived filtering, minimum is {MIN_TOOLS}. "
+            f"The {SHEET_TAB!r} tab may have been renamed, restructured or unshared. "
+            f"Refusing to empty the catalog."
+        )
+    return tools, warnings

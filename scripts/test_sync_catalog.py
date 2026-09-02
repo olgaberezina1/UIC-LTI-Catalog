@@ -123,5 +123,46 @@ class RowToToolTest(unittest.TestCase):
         self.assertIn("Labflow", str(ctx.exception))
 
 
+class BuildCatalogTest(unittest.TestCase):
+    def many_rows(self, count, prefix="Tool"):
+        return [full_row(**{sc.COL_NAME: f"{prefix} {i:03d}"}) for i in range(count)]
+
+    def test_drops_unpublished_rows(self):
+        rows = self.many_rows(sc.MIN_TOOLS)
+        rows.append(full_row(**{sc.COL_NAME: "Kortex", sc.COL_BB: "Retired", sc.COL_CV: "Retired"}))
+        rows.append(full_row(**{sc.COL_NAME: "", sc.COL_BB: "Yes", sc.COL_CV: "Yes"}))
+        tools, _ = sc.build_catalog(rows)
+        names = [t["name"] for t in tools]
+        self.assertEqual(len(names), sc.MIN_TOOLS)
+        self.assertNotIn("Kortex", names)
+
+    def test_keeps_the_first_of_a_duplicate_and_warns(self):
+        rows = self.many_rows(sc.MIN_TOOLS)
+        rows.append(full_row(**{sc.COL_NAME: "Packback", sc.COL_CV: "Yes"}))
+        rows.append(full_row(**{sc.COL_NAME: "Packback", sc.COL_CV: "No"}))
+        tools, warnings = sc.build_catalog(rows)
+        packback = [t for t in tools if t["name"] == "Packback"]
+        self.assertEqual(len(packback), 1)
+        self.assertEqual(packback[0]["cv"], "yes")
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Packback", warnings[0])
+
+    def test_sorts_case_insensitively_by_name(self):
+        rows = self.many_rows(sc.MIN_TOOLS, prefix="Zed")
+        rows.append(full_row(**{sc.COL_NAME: "ACS Lab Safety UIC"}))
+        rows.append(full_row(**{sc.COL_NAME: "Acadly"}))
+        rows.append(full_row(**{sc.COL_NAME: "ATI Testing"}))
+        tools, _ = sc.build_catalog(rows)
+        self.assertEqual(
+            [t["name"] for t in tools[:3]],
+            ["Acadly", "ACS Lab Safety UIC", "ATI Testing"],
+        )
+
+    def test_refuses_to_build_a_suspiciously_small_catalog(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.build_catalog(self.many_rows(sc.MIN_TOOLS - 1))
+        self.assertIn(str(sc.MIN_TOOLS), str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
