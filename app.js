@@ -1,8 +1,12 @@
 (function () {
   'use strict';
 
-  // ─── 1. Catalog data (verbatim port from data.js) ──────────────
-  const LTI_TOOLS = [
+  // ─── 1. Catalog data ────────────────────────────────────────────
+  // The array below is the OFFLINE FALLBACK — it's used if the Google Sheet
+  // can't be reached (no internet, sheet made private, network blocked, etc).
+  // The live data normally comes from fetchCatalogFromSheet() below, which
+  // overwrites LTI_TOOLS before the page renders.
+  const LTI_TOOLS_FALLBACK = [
     { name: "Acadly", desc: "A comprehensive classroom management platform that combines attendance tracking, live polling, assignments, and communication tools for enhanced student engagement.", bb: "yes", cv: "yes", t2: "yes", tags: ["engagement","polling","attendance","async","sync"] },
     { name: "ACS Lab Safety UIC", desc: "A lab safety training and assessment platform specifically designed for University of Illinois Chicago to ensure compliance with laboratory safety protocols and regulations.", bb: "yes", cv: "yes", t2: "yes", tags: ["assessment","science","compliance","training"] },
     { name: "Aleks", desc: "An adaptive learning platform that uses artificial intelligence to provide personalized math and science instruction with detailed progress tracking.", bb: "no", cv: "yes", t2: "yes", tags: ["adaptive","math","science","stem","practice","publisher"] },
@@ -62,6 +66,123 @@
     { name: "Zoom", desc: "A video conferencing platform integration that enables virtual meetings, webinars, and online classroom sessions within the LMS environment. Zoom Canvas Setup", bb: "yes", cv: "yes", t2: "yes", tags: ["sync","collaboration"], video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=0bf11245-7727-4f25-b10f-b39a01238fc1" },
     { name: "Zybooks", desc: "An interactive online textbook platform that combines reading materials with hands-on coding exercises and animations for computer science and engineering courses.", bb: "yes", cv: "yes", t2: "yes", tags: ["textbook","cs","coding","stem","practice"] },
   ];
+
+  // Mutable — this is what the rest of the app reads. Starts out as the
+  // fallback and gets replaced with sheet data (if the fetch succeeds)
+  // before render() is first called.
+  let LTI_TOOLS = LTI_TOOLS_FALLBACK;
+
+  // ─── 1b. Load catalog data from a public Google Sheet ──────────
+  // Publish-friendly trick: Google Sheets will serve any sheet that's
+  // shared as "Anyone with the link can view" as a CSV file at this URL.
+  // gid = the specific tab's id (from the "#gid=" part of your sheet URL).
+  const SHEET_ID = "1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY";
+  const SHEET_GID = "1788000122";
+  const SHEET_CSV_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+
+  // Parses one line of CSV-ish text into an array of cell strings.
+  // Handles quoted fields, commas inside quotes, and "" as an escaped quote.
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let cell = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+
+      if (inQuotes) {
+        if (c === '"' && next === '"') { cell += '"'; i++; }
+        else if (c === '"') { inQuotes = false; }
+        else { cell += c; }
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(cell); cell = ""; }
+        else if (c === '\r') { /* skip */ }
+        else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ""; }
+        else { cell += c; }
+      }
+    }
+    // Last cell/row (files don't always end with a trailing newline).
+    if (cell.length > 0 || row.length > 0) { row.push(cell); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== "")); // drop blank lines
+  }
+
+  // Turns "yes / no / na / — / pending / ..." style status cells into the
+  // lowercase tokens the scoring + rendering logic expects.
+  function normalizeStatus(v) {
+    const s = String(v || "").trim();
+    if (s === "" || s === "-" ) return "—";
+    return s.toLowerCase();
+  }
+
+  // Maps one CSV row (as an object keyed by lowercased header) into the
+  // { name, desc, bb, cv, t2, tags, video } shape used everywhere else.
+  // Column matching is forgiving about naming/spacing so small header
+  // differences in the sheet don't break the import.
+  function rowToTool(rowObj) {
+    const get = (...keys) => {
+      for (const k of keys) {
+        const hit = Object.keys(rowObj).find(h => h.replace(/[^a-z0-9]/g, "") === k);
+        if (hit && rowObj[hit] !== undefined) return rowObj[hit];
+      }
+      return "";
+    };
+
+    const name = get("name", "tool", "toolname").trim();
+    if (!name) return null; // skip blank/section rows
+
+    const desc = get("desc", "description").trim();
+    const bb = normalizeStatus(get("bb", "blackboard"));
+    const cv = normalizeStatus(get("cv", "canvas"));
+    const t2 = normalizeStatus(get("t2", "titleii", "a11y", "accessibility"));
+    const tagsRaw = get("tags", "tag");
+    const tags = tagsRaw
+      ? tagsRaw.split(/[|,]/).map(t => t.trim().toLowerCase()).filter(Boolean)
+      : [];
+    const video = get("video", "videourl", "walkthrough").trim();
+
+    const tool = { name, desc, bb, cv, t2, tags };
+    if (video) tool.video = video;
+    return tool;
+  }
+
+  async function fetchCatalogFromSheet() {
+    const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Sheet fetch failed: HTTP ${res.status}`);
+    const text = await res.text();
+
+    const table = parseCSV(text);
+    if (table.length < 2) throw new Error("Sheet returned no data rows");
+
+    const headers = table[0].map(h => h.trim().toLowerCase());
+    const tools = table.slice(1)
+      .map(cells => {
+        const rowObj = {};
+        headers.forEach((h, i) => { rowObj[h] = cells[i] ?? ""; });
+        return rowToTool(rowObj);
+      })
+      .filter(Boolean);
+
+    if (tools.length === 0) throw new Error("Sheet parsed to zero valid tools");
+    return tools;
+  }
+
+  // Loads live data and swaps it into LTI_TOOLS. Falls back to the embedded
+  // list (and logs why) if anything goes wrong — the app should never be
+  // left with an empty catalog just because the sheet was unreachable.
+  async function loadCatalogData() {
+    try {
+      const tools = await fetchCatalogFromSheet();
+      LTI_TOOLS = tools;
+      console.info(`Loaded ${tools.length} tools from Google Sheet.`);
+    } catch (err) {
+      LTI_TOOLS = LTI_TOOLS_FALLBACK;
+      console.warn("Falling back to embedded catalog data:", err);
+    }
+  }
 
   const AVAIL_LABEL = {
     yes: "Yes",
@@ -557,8 +678,13 @@
   }
 
   // ─── 7. Init ───────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     main = document.querySelector('main');
+
+    // Fetch the live catalog from the public Google Sheet before we render
+    // anything. If this fails (offline, sheet made private, etc.) LTI_TOOLS
+    // is left pointing at the embedded fallback data instead.
+    await loadCatalogData();
 
     // Populate hero count from data
     document.getElementById('hero-count').textContent =
