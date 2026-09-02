@@ -74,6 +74,10 @@ Each tool is an object with these properties:
 | `research` | Researching |
 | `request` | Available per request |
 | `progress` | In progress |
+| `contract` | Contract not yet approved |
+| `migrating` | Migrating — Aug 15 |
+| `standalone` | Standalone |
+| `standalone_mig` | Standalone — migrating Aug 15 |
 | `na` | N/A |
 | `—` | — |
 
@@ -87,7 +91,7 @@ The finder walks the user through 2 questions:
    tool's category via the `GOAL_CATEGORIES` map in `app.js`
 2. **Which LMS?** — Canvas or Blackboard
 
-Title II compliance is always required (hardcoded `requireA11y = true`). Top 3
+Tools are scored against answers via `scoreTools()`. Title II compliance is always required (hardcoded `requireA11y = true`). Top 3
 results are shown as cards; additional matches appear as runners-up.
 
 There is no discipline question. The sheet's categories can't express
@@ -102,7 +106,7 @@ between them — so the question was removed rather than answered badly.
 - Filterable by platform (Canvas / Blackboard / All)
 - Filterable by Title II compliance
 - Columns: Tool | What it's for | Canvas | Blackboard | Title II
-- Tools with a `video` property show a "▶ Watch walkthrough" link below the description
+- Tools with a `video` property show a walkthrough link below the description — the label comes from `videoTitle` if present, or falls back to "Watch walkthrough"
 
 ---
 
@@ -144,8 +148,10 @@ the run naming the tool and column — add it to `STATUS_MAP` (and to
 refuses to write a catalog of fewer than 40 tools, so a renamed tab or revoked
 sharing can't empty the site.
 
-A row is published unless its name is blank, or **both** availability columns
-are `Excluded`, `Retired`, or empty.
+A row is published unless its name is blank, its description is blank, or
+**both** availability columns are `Excluded` or `Retired`. Blank availability on
+its own does not unpublish a row — Virtual Machine has none because it isn't an
+LMS integration.
 
 ### Local preview
 
@@ -162,11 +168,13 @@ shows a catalog. Serve it instead:
 
 ## Key Design Decisions
 
+- **Title II always required** — the finder hardcodes `requireA11y = true`; there is no question for it
 - **The sheet is the source of truth** — `tools.json` is generated; the repo
   holds no hand-maintained tool data
-- **Unpublished rows are filtered at sync time** — a row is dropped when both
-  availability columns are `Excluded`, `Retired`, or empty
+- **Unpublished rows are filtered at sync time** — a row is dropped when it has
+  no description, or when both availability columns are `Excluded` or `Retired`
 - **No hand-maintained tags** — the finder scores on the sheet's `Category`
   through the `GOAL_CATEGORIES` map, which is UI configuration rather than
   per-tool data
 - **Local preview needs a server** — `fetch()` is blocked on `file://`
+- **No build process** — changes to any file are live immediately after GitHub Pages propagates (usually 1–3 minutes)
