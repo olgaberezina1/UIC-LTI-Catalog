@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Sync the UIC LTI Catalog from its Google Sheet into tools.json."""
+
+import os
+
+SHEET_ID = "1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=xlsx"
+SHEET_TAB = "Published"
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TOOLS_JSON = os.path.join(REPO_ROOT, "tools.json")
+
+MIN_TOOLS = 40
+
+COL_NAME = "Tool Name1"
+COL_DESC = "Description"
+COL_CATEGORY = "Category"
+COL_BB = "Available in Blackboard"
+COL_CV = "Available in Canvas"
+COL_T2 = "Title II Compliant"
+COL_VIDEO = "UIC Walkthrough Video"
+
+# read_rows() stashes each walkthrough cell's hyperlink target under this key,
+# because the visible cell text is a title like "Piazza Introduction".
+VIDEO_URL_KEY = "_video_url"
+
+# Sheet wording -> the status codes AVAIL_LABEL already renders (app.js:66).
+STATUS_MAP = {
+    "Yes": "yes",
+    "No": "no",
+    "NA": "na",
+    "Standalone": "standalone",
+    "Retired": "retired",
+    "Waiting for vendor response": "pending",
+    "In Progress": "progress",
+    "Available Per Request": "request",
+    "Not licensed, unavailable.": "unlicensed",
+    "": "—",
+    "Status": "—",
+}
+
+# A row dead in both columns is not published. "Excluded" is the sheet's own
+# opt-out flag; blank means nobody has filled the row in yet.
+DROP_STATUSES = {"Excluded", "Retired", ""}
+
+
+class SyncError(Exception):
+    """Raised when the sheet holds something the script must not guess about."""
+
+
+def cell(row, key):
+    """A sheet cell as a stripped string. Cells come back as None when empty."""
+    return str(row.get(key) or "").strip()
+
+
+def map_status(value, tool, column):
+    """Turn one availability cell into its status code."""
+    key = str(value or "").strip()
+    if key not in STATUS_MAP:
+        raise SyncError(
+            f"{tool}: unrecognized {column} value {key!r}. "
+            f"Fix the sheet, or add the value to STATUS_MAP "
+            f"(and to AVAIL_LABEL in app.js if it needs a new label)."
+        )
+    return STATUS_MAP[key]
+
+
+def should_keep(row):
+    """True when a row belongs in the published catalog."""
+    if not cell(row, COL_NAME):
+        return False
+    return not (
+        cell(row, COL_BB) in DROP_STATUSES and cell(row, COL_CV) in DROP_STATUSES
+    )
