@@ -1343,6 +1343,14 @@ category lines, and a two-question finder.
 | Script logic | `cd scripts && python3 -m unittest test_sync_catalog -v` — 24 tests |
 | Sheet parsing | `python3 scripts/sync_catalog.py --dry-run` — 58 tools, Packback warning |
 | Generated data | 58 entries, 10 with `video`, every one with `category`, none with `tags` |
-| Expected first-run diff | ClassRanked `bb no→yes` / `cv contract→yes`; 7 descriptions lose their appended link text (Canvas Studio, Gradescope, Lucid, McGraw Hill Connect, Panopto, Piazza, Zoom) |
+| Expected first-run diff | ClassRanked `bb no→yes` / `cv contract→yes`; ~~7 descriptions lose their appended link text (Canvas Studio, Gradescope, Lucid, McGraw Hill Connect, Panopto, Piazza, Zoom)~~ — see Correction below |
 | Page | Local server: 58 rows, category lines, walkthrough links, clean console, 2-question finder, sensible high-stakes results, URL restore |
 | Live site | 58 tools and a 2-question finder after the final push |
+
+**Correction (2026-09-01):** the struck-through cell above was wrong, and so is the equivalent
+claim implicit in Task 6's expected diff. The seven descriptions did not lose their appended link
+text — that text is a trailing paragraph inside the sheet's own Description cell, and the sync
+preserves it verbatim (the script never edits content). The page renders the description as
+before, now with the same title repeated as the walkthrough link's label beneath it. The actual
+fix is to clean the seven Description cells in the sheet; in the meantime the sync script flags
+them with a non-fatal warning so the operator notices before publishing (final fix wave, item A1).

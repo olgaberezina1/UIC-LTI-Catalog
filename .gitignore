@@ -3,5 +3,6 @@ __pycache__/
 
 # SDD scratch: the .md artifacts (ledger, briefs, reports) are tracked
 # deliberately so work can move between machines; the generated review
-# diffs are not — regenerate them with scripts/review-package.
+# diffs are not — regenerate them with the superpowers SDD skill's
+# review-package script.
 .superpowers/

@@ -250,11 +250,19 @@ GitHub Pages is unaffected — it serves over http.
 against today's data, and nothing else:
 
 - ClassRanked: `bb no→yes`, `cv contract→yes`
-- Seven descriptions lose their appended link text (Canvas Studio, Gradescope, Lucid,
-  McGraw Hill Connect, Panopto, Piazza, Zoom)
+- ~~Seven descriptions lose their appended link text (Canvas Studio, Gradescope, Lucid,
+  McGraw Hill Connect, Panopto, Piazza, Zoom)~~ — see **Correction (2026-09-01)** below
 - `category` added to all 58; `video`/`videoTitle` on the same ten tools as today
 - `tags` removed from all 58
 - A duplicate-name warning for Packback
+
+**Correction (2026-09-01):** the struck-through bullet above was wrong. The seven descriptions
+did not lose their appended link text — that text is a trailing paragraph inside the sheet's own
+Description cell, and the sync preserves it verbatim (the script never edits content; the sheet is
+the source of truth). The page renders the description as before, now with the same title
+repeated as the walkthrough link's label directly beneath it. The actual fix is to clean the seven
+Description cells in the sheet; in the meantime the sync script flags them with a non-fatal
+warning so the operator notices before publishing (final fix wave, item A1).
 
 **Page**, served locally: catalog shows 58 rows and the hero count reads 58; a category line
 sits under each tool name; Panopto's row links to the Panopto URL labelled "How to Embed Panopto
