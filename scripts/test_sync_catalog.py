@@ -164,5 +164,43 @@ class BuildCatalogTest(unittest.TestCase):
         self.assertIn(str(sc.MIN_TOOLS), str(ctx.exception))
 
 
+def tool(name="Acadly", **overrides):
+    base = {"name": name, "desc": "d", "category": "c", "bb": "yes", "cv": "yes", "t2": "yes"}
+    base.update(overrides)
+    return base
+
+
+class DiffCatalogsTest(unittest.TestCase):
+    def test_reports_nothing_when_identical(self):
+        self.assertEqual(sc.diff_catalogs([tool()], [tool()]), [])
+
+    def test_reports_additions_and_removals(self):
+        lines = sc.diff_catalogs([tool("Kortex")], [tool("ATI Testing")])
+        self.assertIn("+ ATI Testing", lines)
+        self.assertIn("- Kortex", lines)
+
+    def test_reports_a_changed_status_with_both_values(self):
+        lines = sc.diff_catalogs(
+            [tool("ClassRanked", bb="no", cv="contract")],
+            [tool("ClassRanked", bb="yes", cv="yes")],
+        )
+        self.assertEqual(lines, ["ClassRanked: bb no->yes, cv contract->yes"])
+
+    def test_summarises_description_changes_without_quoting_them(self):
+        lines = sc.diff_catalogs(
+            [tool("Gradescope", desc="An AI-assisted grading platform. Gradescope Linking Assignments")],
+            [tool("Gradescope", desc="An AI-assisted grading platform.")],
+        )
+        self.assertEqual(lines, ["Gradescope: desc changed"])
+
+    def test_reports_a_newly_added_video(self):
+        lines = sc.diff_catalogs(
+            [tool("Panopto")],
+            [tool("Panopto", video="https://example.test/v", videoTitle="Intro")],
+        )
+        self.assertEqual(len(lines), 1)
+        self.assertIn("video", lines[0])
+
+
 if __name__ == "__main__":
     unittest.main()

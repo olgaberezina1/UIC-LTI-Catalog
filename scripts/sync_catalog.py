@@ -120,3 +120,34 @@ def build_catalog(rows):
             f"Refusing to empty the catalog."
         )
     return tools, warnings
+
+
+DIFF_FIELDS = ("desc", "category", "bb", "cv", "t2", "video", "videoTitle")
+
+
+def diff_catalogs(old, new):
+    """One readable line per difference, for the console and the commit message."""
+    old_by = {t["name"]: t for t in old}
+    new_by = {t["name"]: t for t in new}
+    lines = []
+
+    for name in sorted(set(new_by) - set(old_by), key=str.lower):
+        lines.append(f"+ {name}")
+    for name in sorted(set(old_by) - set(new_by), key=str.lower):
+        lines.append(f"- {name}")
+
+    for name in sorted(set(old_by) & set(new_by), key=str.lower):
+        changes = []
+        for field in DIFF_FIELDS:
+            before = old_by[name].get(field, "")
+            after = new_by[name].get(field, "")
+            if before == after:
+                continue
+            if field == "desc":
+                changes.append("desc changed")
+            else:
+                changes.append(f"{field} {before or '(none)'}->{after or '(none)'}")
+        if changes:
+            lines.append(f"{name}: " + ", ".join(changes))
+
+    return lines
