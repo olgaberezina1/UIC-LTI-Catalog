@@ -194,7 +194,7 @@ def read_rows(path):
 
     sheet = workbook[SHEET_TAB]
     headers = [c.value for c in sheet[1]]
-    for required in (COL_NAME, COL_BB, COL_CV, COL_T2, COL_CATEGORY, COL_VIDEO):
+    for required in (COL_NAME, COL_DESC, COL_BB, COL_CV, COL_T2, COL_CATEGORY, COL_VIDEO):
         if required not in headers:
             raise SyncError(f"expected a {required!r} column, found {headers}")
 
