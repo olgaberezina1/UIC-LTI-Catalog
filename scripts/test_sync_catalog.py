@@ -60,5 +60,68 @@ class ShouldKeepTest(unittest.TestCase):
         self.assertFalse(sc.should_keep(row(name=None)))
 
 
+def full_row(**overrides):
+    base = {
+        sc.COL_NAME: "Panopto",
+        sc.COL_DESC: "A comprehensive video platform for education.",
+        sc.COL_CATEGORY: "Media & Content Creation",
+        sc.COL_BB: "Yes",
+        sc.COL_CV: "Yes",
+        sc.COL_T2: "Yes",
+        sc.COL_VIDEO: None,
+        sc.VIDEO_URL_KEY: "",
+    }
+    base.update(overrides)
+    return base
+
+
+class RowToToolTest(unittest.TestCase):
+    def test_maps_the_plain_fields(self):
+        self.assertEqual(
+            sc.row_to_tool(full_row()),
+            {
+                "name": "Panopto",
+                "desc": "A comprehensive video platform for education.",
+                "category": "Media & Content Creation",
+                "bb": "yes",
+                "cv": "yes",
+                "t2": "yes",
+            },
+        )
+
+    def test_omits_video_keys_when_there_is_no_hyperlink(self):
+        tool = sc.row_to_tool(full_row(**{sc.COL_VIDEO: "Watch this"}))
+        self.assertNotIn("video", tool)
+        self.assertNotIn("videoTitle", tool)
+
+    def test_adds_video_and_title_when_hyperlinked(self):
+        tool = sc.row_to_tool(
+            full_row(
+                **{
+                    sc.COL_VIDEO: "How to Embed Panopto Videos",
+                    sc.VIDEO_URL_KEY: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4006194c",
+                }
+            )
+        )
+        self.assertEqual(
+            tool["video"],
+            "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4006194c",
+        )
+        self.assertEqual(tool["videoTitle"], "How to Embed Panopto Videos")
+
+    def test_strips_whitespace_and_tolerates_empty_cells(self):
+        tool = sc.row_to_tool(
+            full_row(**{sc.COL_NAME: "  Ally  ", sc.COL_DESC: None, sc.COL_T2: ""})
+        )
+        self.assertEqual(tool["name"], "Ally")
+        self.assertEqual(tool["desc"], "")
+        self.assertEqual(tool["t2"], "—")
+
+    def test_propagates_a_bad_status_with_the_tool_name(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.row_to_tool(full_row(**{sc.COL_NAME: "Labflow", sc.COL_CV: "Sort of"}))
+        self.assertIn("Labflow", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -72,3 +72,21 @@ def should_keep(row):
     return not (
         cell(row, COL_BB) in DROP_STATUSES and cell(row, COL_CV) in DROP_STATUSES
     )
+
+
+def row_to_tool(row):
+    """Convert one kept sheet row into a catalog entry."""
+    name = cell(row, COL_NAME)
+    tool = {
+        "name": name,
+        "desc": cell(row, COL_DESC),
+        "category": cell(row, COL_CATEGORY),
+        "bb": map_status(row.get(COL_BB), name, COL_BB),
+        "cv": map_status(row.get(COL_CV), name, COL_CV),
+        "t2": map_status(row.get(COL_T2), name, COL_T2),
+    }
+    url = cell(row, VIDEO_URL_KEY)
+    if url:
+        tool["video"] = url
+        tool["videoTitle"] = cell(row, COL_VIDEO)
+    return tool
