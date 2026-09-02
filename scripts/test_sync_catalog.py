@@ -1,6 +1,13 @@
+import os
+import tempfile
 import unittest
 
 import sync_catalog as sc
+
+try:
+    import openpyxl
+except ImportError:  # pragma: no cover - exercised only where openpyxl is absent
+    openpyxl = None
 
 
 class MapStatusTest(unittest.TestCase):
@@ -130,6 +137,44 @@ class RowToToolTest(unittest.TestCase):
             sc.row_to_tool(full_row(**{sc.COL_NAME: "Labflow", sc.COL_CV: "Sort of"}))
         self.assertIn("Labflow", str(ctx.exception))
 
+    def test_accepts_an_https_video_url(self):
+        tool = sc.row_to_tool(
+            full_row(
+                **{
+                    sc.COL_NAME: "Piazza",
+                    sc.COL_VIDEO: "Piazza Introduction",
+                    sc.VIDEO_URL_KEY: "https://uic.hosted.panopto.com/video1",
+                }
+            )
+        )
+        self.assertEqual(tool["video"], "https://uic.hosted.panopto.com/video1")
+
+    def test_rejects_a_plain_http_video_url_naming_the_tool(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.row_to_tool(
+                full_row(
+                    **{
+                        sc.COL_NAME: "Piazza",
+                        sc.COL_VIDEO: "Piazza Introduction",
+                        sc.VIDEO_URL_KEY: "http://uic.hosted.panopto.com/video1",
+                    }
+                )
+            )
+        self.assertIn("Piazza", str(ctx.exception))
+
+    def test_rejects_a_javascript_video_url_naming_the_tool(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.row_to_tool(
+                full_row(
+                    **{
+                        sc.COL_NAME: "Piazza",
+                        sc.COL_VIDEO: "Piazza Introduction",
+                        sc.VIDEO_URL_KEY: "javascript:alert(1)",
+                    }
+                )
+            )
+        self.assertIn("Piazza", str(ctx.exception))
+
 
 class BuildCatalogTest(unittest.TestCase):
     def many_rows(self, count, prefix="Tool"):
@@ -171,6 +216,50 @@ class BuildCatalogTest(unittest.TestCase):
             sc.build_catalog(self.many_rows(sc.MIN_TOOLS - 1))
         self.assertIn(str(sc.MIN_TOOLS), str(ctx.exception))
 
+    def test_warns_when_description_contains_a_newline(self):
+        rows = self.many_rows(sc.MIN_TOOLS - 1)
+        rows.append(
+            full_row(
+                **{
+                    sc.COL_NAME: "Gradescope",
+                    sc.COL_DESC: "An AI-assisted grading platform.\n\nGradescope Linking Assignments",
+                }
+            )
+        )
+        tools, warnings = sc.build_catalog(rows)
+        self.assertEqual(len(tools), sc.MIN_TOOLS)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Gradescope", warnings[0])
+        self.assertIn("Gradescope Linking Assignments", warnings[0])
+        self.assertIn("clean the sheet's Description cell", warnings[0])
+        # The sheet is the source of truth: the description itself is untouched.
+        kept = [t for t in tools if t["name"] == "Gradescope"][0]
+        self.assertEqual(
+            kept["desc"], "An AI-assisted grading platform.\n\nGradescope Linking Assignments"
+        )
+
+    def test_warns_when_last_line_matches_video_title_even_without_a_newline(self):
+        rows = self.many_rows(sc.MIN_TOOLS - 1)
+        rows.append(
+            full_row(
+                **{
+                    sc.COL_NAME: "Piazza",
+                    sc.COL_DESC: "Piazza Introduction",
+                    sc.COL_VIDEO: "Piazza Introduction",
+                    sc.VIDEO_URL_KEY: "https://uic.hosted.panopto.com/video1",
+                }
+            )
+        )
+        tools, warnings = sc.build_catalog(rows)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Piazza", warnings[0])
+
+    def test_no_warning_for_a_clean_description(self):
+        rows = self.many_rows(sc.MIN_TOOLS - 1)
+        rows.append(full_row(**{sc.COL_NAME: "Acadly", sc.COL_DESC: "A clean, single-line tool."}))
+        tools, warnings = sc.build_catalog(rows)
+        self.assertEqual(warnings, [])
+
 
 def tool(name="Acadly", **overrides):
     base = {"name": name, "desc": "d", "category": "c", "bb": "yes", "cv": "yes", "t2": "yes"}
@@ -208,6 +297,96 @@ class DiffCatalogsTest(unittest.TestCase):
         )
         self.assertEqual(len(lines), 1)
         self.assertIn("video", lines[0])
+
+
+REQUIRED_HEADERS = [
+    sc.COL_NAME,
+    sc.COL_DESC,
+    sc.COL_CATEGORY,
+    sc.COL_BB,
+    sc.COL_CV,
+    sc.COL_T2,
+    sc.COL_VIDEO,
+]
+
+
+@unittest.skipUnless(openpyxl, "openpyxl is not installed")
+class ReadRowsTest(unittest.TestCase):
+    def make_book(self, path, sheet_title, headers, rows=(), hyperlinks=None):
+        """Save a workbook to `path`. `hyperlinks` maps (row, col) -> url, both
+        1-based and counted from the header row (so row 2 is the first data row).
+        """
+        book = openpyxl.Workbook()
+        sheet = book.active
+        sheet.title = sheet_title
+        for col, header in enumerate(headers, start=1):
+            sheet.cell(row=1, column=col, value=header)
+        for r, values in enumerate(rows, start=2):
+            for col, value in enumerate(values, start=1):
+                sheet.cell(row=r, column=col, value=value)
+        for (r, col), url in (hyperlinks or {}).items():
+            sheet.cell(row=r, column=col).hyperlink = url
+        book.save(path)
+
+    def test_reads_rows_keyed_by_header_skips_blank_and_carries_hyperlink(self):
+        headers = REQUIRED_HEADERS + [None]  # one blank-header column, to be skipped
+        rows = [
+            [
+                "Piazza",
+                "A discussion tool.",
+                "Collaboration & Communication",
+                "Yes",
+                "Yes",
+                "Yes",
+                "Piazza Introduction",
+                "ignored",
+            ],
+            [
+                "Zoom",
+                "Video conferencing.",
+                "Media & Content Creation",
+                "Yes",
+                "Yes",
+                "No",
+                "Zoom Basics",
+                "ignored",
+            ],
+        ]
+        video_col = headers.index(sc.COL_VIDEO) + 1
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "book.xlsx")
+            self.make_book(
+                path,
+                sc.SHEET_TAB,
+                headers,
+                rows,
+                hyperlinks={(2, video_col): "https://example.test/piazza-video"},
+            )
+            result = sc.read_rows(path)
+
+        self.assertEqual(len(result), 2)
+        self.assertNotIn(None, result[0])
+        self.assertEqual(result[0][sc.COL_NAME], "Piazza")
+        self.assertEqual(result[0][sc.COL_DESC], "A discussion tool.")
+        self.assertEqual(result[0][sc.VIDEO_URL_KEY], "https://example.test/piazza-video")
+        self.assertEqual(result[1][sc.COL_NAME], "Zoom")
+        self.assertEqual(result[1][sc.VIDEO_URL_KEY], "")
+
+    def test_raises_when_the_sheet_tab_is_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "book.xlsx")
+            self.make_book(path, "Some Other Tab", REQUIRED_HEADERS)
+            with self.assertRaises(sc.SyncError):
+                sc.read_rows(path)
+
+    def test_raises_naming_the_missing_description_column(self):
+        headers = [h for h in REQUIRED_HEADERS if h != sc.COL_DESC]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "book.xlsx")
+            self.make_book(path, sc.SHEET_TAB, headers)
+            with self.assertRaises(sc.SyncError) as ctx:
+                sc.read_rows(path)
+            self.assertIn(sc.COL_DESC, str(ctx.exception))
 
 
 if __name__ == "__main__":
