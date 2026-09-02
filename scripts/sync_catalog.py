@@ -48,8 +48,11 @@ STATUS_MAP = {
 }
 
 # A row dead in both columns is not published. "Excluded" is the sheet's own
-# opt-out flag; blank means nobody has filled the row in yet.
-DROP_STATUSES = {"Excluded", "Retired", ""}
+# opt-out flag. Blank is deliberately NOT here: Virtual Machine is blank in both
+# columns because it is a campus computing resource rather than an LMS
+# integration, and it belongs in the catalog. Content-free rows are caught by the
+# description check in should_keep() instead.
+DROP_STATUSES = {"Excluded", "Retired"}
 
 
 class SyncError(Exception):
@@ -76,6 +79,9 @@ def map_status(value, tool, column):
 def should_keep(row):
     """True when a row belongs in the published catalog."""
     if not cell(row, COL_NAME):
+        return False
+    # A name with nothing behind it is a placeholder, not a tool.
+    if not cell(row, COL_DESC):
         return False
     return not (
         cell(row, COL_BB) in DROP_STATUSES and cell(row, COL_CV) in DROP_STATUSES

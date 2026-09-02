@@ -36,8 +36,8 @@ class MapStatusTest(unittest.TestCase):
         self.assertIn("Maybe?", message)
 
 
-def row(name="Acadly", bb="Yes", cv="Yes"):
-    return {sc.COL_NAME: name, sc.COL_BB: bb, sc.COL_CV: cv}
+def row(name="Acadly", bb="Yes", cv="Yes", desc="A tool."):
+    return {sc.COL_NAME: name, sc.COL_DESC: desc, sc.COL_BB: bb, sc.COL_CV: cv}
 
 
 class ShouldKeepTest(unittest.TestCase):
@@ -51,13 +51,21 @@ class ShouldKeepTest(unittest.TestCase):
     def test_drops_rows_dead_in_both(self):
         self.assertFalse(sc.should_keep(row(bb="Excluded", cv="Excluded")))
         self.assertFalse(sc.should_keep(row(bb="Retired", cv="Retired")))
-        self.assertFalse(sc.should_keep(row(bb="", cv="")))
         self.assertFalse(sc.should_keep(row(bb="Excluded", cv="Retired")))
 
     def test_drops_rows_without_a_name(self):
         self.assertFalse(sc.should_keep(row(name="")))
         self.assertFalse(sc.should_keep(row(name="   ")))
         self.assertFalse(sc.should_keep(row(name=None)))
+
+    def test_keeps_a_described_row_with_no_availability_recorded(self):
+        # Virtual Machine: a campus computing resource, not an LMS integration,
+        # so both availability columns are blank. It is in the catalog today.
+        self.assertTrue(sc.should_keep(row(name="Virtual Machine", bb="", cv="")))
+
+    def test_drops_a_placeholder_row_with_no_description(self):
+        # Coursera: a bare name with every other cell empty.
+        self.assertFalse(sc.should_keep(row(name="Coursera", desc="", bb="", cv="")))
 
 
 def full_row(**overrides):
