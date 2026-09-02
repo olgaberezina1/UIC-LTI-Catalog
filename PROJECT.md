@@ -23,7 +23,11 @@ A static website listing all LTI tools and apps approved for use at the Universi
 UIC-LTI-Catalog/
 ├── index.html     — page structure and markup
 ├── styles.css     — all styling
-└── app.js         — all data and logic (single file, IIFE)
+├── app.js         — all logic (single file, IIFE)
+├── tools.json     — catalog data, generated from the Google Sheet
+└── scripts/
+    ├── sync_catalog.py       — regenerates tools.json from the sheet
+    └── test_sync_catalog.py  — unit tests for the sync script
 ```
 
 ---
@@ -43,7 +47,7 @@ The `data-screen` attribute on `<main>` controls which screen is visible via CSS
 
 ---
 
-## Tool Data (`LTI_TOOLS` array in `app.js`)
+## Tool Data (`tools.json`)
 
 Each tool is an object with these properties:
 
@@ -54,8 +58,9 @@ Each tool is an object with these properties:
 | `bb` | string | Blackboard availability status code |
 | `cv` | string | Canvas availability status code |
 | `t2` | string | Title II compliance status code |
-| `tags` | array | Keywords used for finder scoring and filtering |
+| `category` | string | Sheet category — shown under the tool name and used for finder scoring |
 | `video` | string *(optional)* | Panopto walkthrough URL — renders a "Watch walkthrough" link in the catalog |
+| `videoTitle` | string *(optional)* | Link text from the sheet, used as the walkthrough link's label |
 
 ### Availability Status Codes (`AVAIL_LABEL`)
 
@@ -74,34 +79,20 @@ Each tool is an object with these properties:
 
 ---
 
-## Tools with Panopto Walkthrough Videos
+## Find My Tool
 
-| Tool | Panopto ID |
-|---|---|
-| Canvas Moderated Grading | `392074dc-b258-4dd5-a318-b3c2015c2f81` |
-| Canvas Studio | `010a32e8-b48c-455c-b880-b3680147a91b` |
-| Gradescope | `c7451af0-39a4-4167-8c1d-b36b012f039b` |
-| iClicker | `8bba0d48-cd9a-4370-96e3-b43201411c63` |
-| ILP Grading | `d8c14696-939c-4623-94c3-b3a10166c826` |
-| Lucid | `629d8b59-42da-44d9-b857-b3a6016ab679` |
-| McGraw Hill Connect | `a87a3cab-ef47-49f0-a177-b369012eac93` |
-| Panopto | `4006194c-3a9e-4339-93b1-b367013674af` |
-| Piazza | `c3acad21-4a04-4593-a2e2-b36b00fee801` |
-| Zoom | `0bf11245-7727-4f25-b10f-b39a01238fc1` |
+The finder walks the user through 2 questions:
 
-All URLs follow the pattern: `https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=<ID>`
-
----
-
-## Find My Tool Finder
-
-The finder walks the user through 3 questions:
-
-1. **What are your goals?** (multi-select) — pedagogy/use case tags
+1. **What do you want students to do?** (multi-select) — matched against each
+   tool's category via the `GOAL_CATEGORIES` map in `app.js`
 2. **Which LMS?** — Canvas or Blackboard
-3. **What discipline?** — subject area tags
 
-Tools are scored against answers via `scoreTools()`. Title II compliance is always required (hardcoded `requireA11y = true`). Top 3 results are shown as cards; additional matches appear as runners-up.
+Title II compliance is always required (hardcoded `requireA11y = true`). Top 3
+results are shown as cards; additional matches appear as runners-up.
+
+There is no discipline question. The sheet's categories can't express
+discipline — its two health-sciences tools sit in categories holding 16 tools
+between them — so the question was removed rather than answered badly.
 
 ---
 
@@ -135,17 +126,47 @@ Tools are scored against answers via `scoreTools()`. Title II compliance is alwa
 
 ## How to Update Tool Data
 
-1. Open `app.js`
-2. Find the `LTI_TOOLS` array (starts at line 5)
-3. Add, edit, or remove tool objects — tools are listed alphabetically by name
-4. To add a walkthrough video, add `video: "https://uic.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=<ID>"` to the tool object
-5. Commit and push to `main` — GitHub Pages deploys automatically
+Tool data lives in the **Google Sheet**, not in this repo. `tools.json` is
+generated from it — never edit `tools.json` by hand, your change will be
+overwritten on the next sync.
+
+1. Edit the [source sheet](https://docs.google.com/spreadsheets/d/1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY/edit), **Published** tab
+2. Preview what would change: `python3 scripts/sync_catalog.py --dry-run`
+3. Apply it: `python3 scripts/sync_catalog.py` — writes `tools.json`, commits and pushes
+4. GitHub Pages redeploys in 1–3 minutes
+
+The script downloads the sheet as **xlsx**, not CSV: CSV export flattens the
+walkthrough cells to their link text and loses the Panopto URLs.
+
+It stops rather than guess. An availability value it doesn't recognize aborts
+the run naming the tool and column — add it to `STATUS_MAP` (and to
+`AVAIL_LABEL` in `app.js` if it needs a new label), or fix the sheet. It also
+refuses to write a catalog of fewer than 40 tools, so a renamed tab or revoked
+sharing can't empty the site.
+
+A row is published unless its name is blank, or **both** availability columns
+are `Excluded`, `Retired`, or empty.
+
+### Local preview
+
+`fetch()` doesn't work on `file://`, so opening `index.html` directly no longer
+shows a catalog. Serve it instead:
+
+    python3 -m http.server 8000    # then http://localhost:8000
+
+### Running the script's tests
+
+    cd scripts && python3 -m unittest test_sync_catalog -v
 
 ---
 
 ## Key Design Decisions
 
-- **Title II always required** — the finder hardcodes `requireA11y = true`; there is no question for it
-- **Retired tools removed from catalog** — tools that show "Retired" in both Canvas and Blackboard columns were removed from the catalog to keep the list clean
-- **Single source of truth** — all tool data lives in `LTI_TOOLS` in `app.js`; the finder and catalog both read from it
-- **No build process** — changes to any file are live immediately after GitHub Pages propagates (usually 1–3 minutes)
+- **The sheet is the source of truth** — `tools.json` is generated; the repo
+  holds no hand-maintained tool data
+- **Unpublished rows are filtered at sync time** — a row is dropped when both
+  availability columns are `Excluded`, `Retired`, or empty
+- **No hand-maintained tags** — the finder scores on the sheet's `Category`
+  through the `GOAL_CATEGORIES` map, which is UI configuration rather than
+  per-tool data
+- **Local preview needs a server** — `fetch()` is blocked on `file://`
