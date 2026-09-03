@@ -1,7 +1,7 @@
 __pycache__/
 .DS_Store
 
-# SDD scratch: the .md artifacts (ledger, briefs, reports) are tracked
-# deliberately so work can move between machines; the generated review
-# diffs are not — regenerate them with scripts/review-package.
+# Process artifacts from the superpowers plugin (SDD ledgers, briefs,
+# review diffs, design specs and implementation plans) stay out of the repo.
 .superpowers/
+docs/superpowers/

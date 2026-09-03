@@ -9,7 +9,9 @@
   async function loadTools() {
     const res = await fetch('tools.json', { cache: 'no-cache' });
     if (!res.ok) throw new Error(`tools.json: HTTP ${res.status}`);
-    LTI_TOOLS = await res.json();
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('tools.json is not an array');
+    LTI_TOOLS = data;
   }
 
   const AVAIL_LABEL = {
@@ -61,15 +63,16 @@
     },
   ];
 
-  // Tiny HTML-escape helper for any interpolated text. (Tool data is trusted,
-  // but escape anyway so we don't accidentally break with an `&` in copy.)
+  // Tiny HTML-escape helper for any interpolated text. Tool data is external —
+  // fetched from tools.json, generated from a spreadsheet — so escaping is required.
   function esc(s) {
     return String(s).replace(/[&<>"']/g, c => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[c]));
   }
 
-  // ─── 2. Scoring (verbatim port from data.js) ───────────────────
+  // ─── 2. Scoring ──────────────────────────────────────────────
+  // Goals match a tool by its `category`, via GOAL_CATEGORIES below.
   // Which sheet categories satisfy each finder goal. This is UI configuration,
   // not tool data — the sheet stays the only per-tool source. A category that
   // appears here nowhere simply never matches a goal; those tools still show in
@@ -140,7 +143,7 @@
     },
   };
 
-  // How many catalog rows per page (59 tools → 2 pages).
+  // How many catalog rows per page.
   const CATALOG_PAGE_SIZE = 30;
 
   // ─── 4. DOM cache (filled on init) ─────────────────────────────
@@ -154,7 +157,6 @@
     renderCatalog();
   }
 
-  // Stubs filled in by later tasks
   function renderFinder() {
     const q = QUESTIONS[state.step];
     const total = QUESTIONS.length;

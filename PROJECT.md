@@ -11,7 +11,7 @@ A static website listing all LTI tools and apps approved for use at the Universi
 
 ## Tech Stack
 
-- **Pure static HTML/CSS/JS** — no build step, no framework, no dependencies
+- **Pure static HTML/CSS/JS** — no build step, no framework, no dependencies (the page itself; the sync script needs openpyxl — see "How to Update Tool Data")
 - **Hosted on GitHub Pages** (auto-deploys on push to `main`)
 - **Fonts:** Google Fonts — Source Serif 4, Source Sans 3, JetBrains Mono
 
@@ -59,7 +59,7 @@ Each tool is an object with these properties:
 | `cv` | string | Canvas availability status code |
 | `t2` | string | Title II compliance status code |
 | `category` | string | Sheet category — shown under the tool name and used for finder scoring |
-| `video` | string *(optional)* | Panopto walkthrough URL — renders a "Watch walkthrough" link in the catalog |
+| `video` | string *(optional)* | Panopto walkthrough URL — renders a walkthrough link in the catalog, labelled from `videoTitle` if present, else "Watch walkthrough" |
 | `videoTitle` | string *(optional)* | Link text from the sheet, used as the walkthrough link's label |
 
 ### Availability Status Codes (`AVAIL_LABEL`)
@@ -134,6 +134,8 @@ Tool data lives in the **Google Sheet**, not in this repo. `tools.json` is
 generated from it — never edit `tools.json` by hand, your change will be
 overwritten on the next sync.
 
+The script needs Python 3 with **openpyxl** installed (`python3 -m pip install openpyxl`, or a venv).
+
 1. Edit the [source sheet](https://docs.google.com/spreadsheets/d/1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY/edit), **Published** tab
 2. Preview what would change: `python3 scripts/sync_catalog.py --dry-run`
 3. Apply it: `python3 scripts/sync_catalog.py` — writes `tools.json`, commits and pushes
@@ -146,7 +148,9 @@ It stops rather than guess. An availability value it doesn't recognize aborts
 the run naming the tool and column — add it to `STATUS_MAP` (and to
 `AVAIL_LABEL` in `app.js` if it needs a new label), or fix the sheet. It also
 refuses to write a catalog of fewer than 40 tools, so a renamed tab or revoked
-sharing can't empty the site.
+sharing can't empty the site. Before it commits and pushes, it also checks
+that the local repo is on `main` and up to date with `origin/main`, refusing
+to run otherwise.
 
 A row is published unless its name is blank, its description is blank, or
 **both** availability columns are `Excluded` or `Retired`. Blank availability on
@@ -171,8 +175,9 @@ shows a catalog. Serve it instead:
 - **Title II always required** — the finder hardcodes `requireA11y = true`; there is no question for it
 - **The sheet is the source of truth** — `tools.json` is generated; the repo
   holds no hand-maintained tool data
-- **Unpublished rows are filtered at sync time** — a row is dropped when it has
-  no description, or when both availability columns are `Excluded` or `Retired`
+- **Unpublished rows are filtered at sync time** — a row is dropped when its
+  name is blank, its description is blank, or both availability columns are
+  `Excluded` or `Retired`
 - **No hand-maintained tags** — the finder scores on the sheet's `Category`
   through the `GOAL_CATEGORIES` map, which is UI configuration rather than
   per-tool data

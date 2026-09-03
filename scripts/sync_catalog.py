@@ -7,9 +7,9 @@ import os
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
-
-import openpyxl
+import zipfile
 
 SHEET_ID = "1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=xlsx"
@@ -19,6 +19,11 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_JSON = os.path.join(REPO_ROOT, "tools.json")
 
 MIN_TOOLS = 40
+
+RECOVERY_HINT = (
+    "tools.json is written locally — inspect with 'git status', then "
+    "'git push origin main' once it is committed"
+)
 
 COL_NAME = "Tool Name1"
 COL_DESC = "Description"
@@ -101,9 +106,37 @@ def row_to_tool(row):
     }
     url = cell(row, VIDEO_URL_KEY)
     if url:
+        if not url.startswith("https://"):
+            raise SyncError(
+                f"{name}: walkthrough video URL {url!r} is not https — fix the "
+                f"sheet's hyperlink"
+            )
         tool["video"] = url
         tool["videoTitle"] = cell(row, COL_VIDEO)
     return tool
+
+
+def lint_description(tool):
+    """A non-fatal note when a Description cell needs sheet cleanup, else None.
+
+    The sheet is the source of truth and this script never edits content — it
+    only flags descriptions that carry a newline, or whose trailing line
+    duplicates the walkthrough video's title (a leftover from pasting the
+    video's link text into the Description cell).
+    """
+    desc = tool["desc"]
+    lines = [line.strip() for line in desc.split("\n") if line.strip()]
+    last_line = lines[-1] if lines else ""
+    video_title = tool.get("videoTitle", "").strip()
+    trailing_matches_title = bool(video_title) and last_line.lower() == video_title.lower()
+
+    if "\n" not in desc and not trailing_matches_title:
+        return None
+
+    return (
+        f"{tool['name']}: description carries a trailing line {last_line!r} — "
+        f"clean the sheet's Description cell"
+    )
 
 
 def build_catalog(rows):
@@ -124,6 +157,9 @@ def build_catalog(rows):
             continue
         seen.add(tool["name"])
         tools.append(tool)
+        lint = lint_description(tool)
+        if lint:
+            warnings.append(lint)
 
     tools.sort(key=lambda t: t["name"].lower())
 
@@ -186,7 +222,9 @@ def download_xlsx(dest):
 
 def read_rows(path):
     """Read the Published tab into dicts keyed by header, plus the video URL."""
-    workbook = openpyxl.load_workbook(path)
+    import openpyxl  # imported here so the pure-function tests need not install it
+
+    workbook = openpyxl.load_workbook(path, data_only=True)
     if SHEET_TAB not in workbook.sheetnames:
         raise SyncError(
             f"no {SHEET_TAB!r} tab in the workbook, found {workbook.sheetnames}"
@@ -225,13 +263,45 @@ def git(*args):
     return result.stdout
 
 
+def is_ancestor(ancestor, ref):
+    """True when `ancestor` is reachable from `ref` (git merge-base --is-ancestor).
+
+    Not routed through git() above: a "no" answer is a normal, non-zero exit
+    for this command, not a failure to report as one.
+    """
+    result = subprocess.run(
+        ("git", "merge-base", "--is-ancestor", ancestor, ref),
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
+
+
+def ensure_publishable():
+    """Pre-flight for the real (non-dry-run) path, before write_tools() runs.
+
+    The script publishes unattended, so it refuses to run anywhere but a
+    local main that is caught up with origin — otherwise a sync from a stale
+    checkout could push a confusing merge or silently clobber newer history.
+    """
+    branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
+    if branch != "main":
+        raise SyncError(
+            f"on branch '{branch}' — the script publishes from main; switch branches first"
+        )
+    git("fetch", "origin", "main")
+    if not is_ancestor("origin/main", "HEAD"):
+        raise SyncError("local main is behind origin/main — pull first")
+
+
 def commit_and_push(summary):
     """Commit tools.json alone, then push. Never stages anything else."""
     git("add", "--", TOOLS_JSON)
     message = (
         "Sync catalog from Google Sheet\n\n"
         + "\n".join(summary)
-        + "\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n"
+        + "\n\nGenerated-By: scripts/sync_catalog.py\n"
     )
     git("commit", "-m", message)
     git("push", "origin", "main")
@@ -282,8 +352,16 @@ def main(argv=None):
         print("\ndry run — nothing written")
         return 0
 
+    ensure_publishable()
+
     write_tools(tools)
-    commit_and_push(summary)
+    try:
+        commit_and_push(summary)
+    except Exception:
+        # Whatever went wrong here (SyncError from git(), or anything else),
+        # tools.json is already on disk — say so before the exception propagates.
+        print(RECOVERY_HINT, file=sys.stderr)
+        raise
     print(f"\ncommitted and pushed {len(summary)} change(s)")
     return 0
 
@@ -291,6 +369,14 @@ def main(argv=None):
 if __name__ == "__main__":
     try:
         sys.exit(main())
-    except SyncError as error:
+    except (
+        SyncError,
+        urllib.error.URLError,
+        zipfile.BadZipFile,
+        OSError,
+        subprocess.CalledProcessError,
+    ) as error:
+        # Known failure modes print in the script's own format. Anything else
+        # is unrecognized and should traceback loudly rather than be muffled.
         print(f"error: {error}", file=sys.stderr)
         sys.exit(1)
