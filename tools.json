@@ -116,6 +116,14 @@
     "t2": "—"
   },
   {
+    "name": "Coursera",
+    "desc": "Coursera for Campus provides students and faculty with access to online courses, Professional Certificates, Guided Projects, and other learning content from universities and industry partners. It can integrate with an institution's learning management system to support access to external learning content, skills development, and career-focused learning.",
+    "category": "Online Learning & Professional Development",
+    "bb": "—",
+    "cv": "yes",
+    "t2": "yes"
+  },
+  {
     "name": "Echo360",
     "desc": "A lecture capture and video management platform that enables recording, streaming, and sharing of educational video content.",
     "category": "Media & Content Creation",
