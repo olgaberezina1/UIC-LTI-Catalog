@@ -370,6 +370,14 @@
     "t2": "yes"
   },
   {
+    "name": "PrairieLearn",
+    "desc": "PrairieLearn is an online assessment platform designed for creating and delivering customizable homework, quizzes, and exams, with support for randomized questions and automated grading. It integrates with learning management systems to support assignment linking, roster synchronization, and grade passback.",
+    "category": "Assessment & Testing",
+    "bb": "no",
+    "cv": "yes",
+    "t2": "yes"
+  },
+  {
     "name": "Redshelf",
     "desc": "A digital textbook platform specifically configured for University of Illinois Chicago that provides access to e-textbooks and educational materials.",
     "category": "Content Delivery & Digital Textbooks",
