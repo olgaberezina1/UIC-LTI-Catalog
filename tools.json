@@ -170,8 +170,8 @@
     "desc": "A science education platform that provides interactive simulations and virtual laboratory experiences for science courses.",
     "category": "Specialized Academic Platforms",
     "bb": "yes",
-    "cv": "progress",
-    "t2": "—"
+    "cv": "no",
+    "t2": "no"
   },
   {
     "name": "iClicker",
