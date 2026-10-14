@@ -215,6 +215,9 @@
       multi: false,
       // Three across: 11 categories in 4 rows rather than 6.
       columns: 3,
+      // No letter badges — the category names carry themselves, and A–K over
+      // three columns reads as an ordering that doesn't mean anything.
+      letters: false,
       options: FINDER_TAXONOMY.map(cat => ({
         v: cat.name,
         t: cat.name,
@@ -368,7 +371,7 @@
                     data-value="${esc(dataValue)}"
                     data-multi="${isMulti}"
                     data-selected="${selected}">
-              <span class="letter">${String.fromCharCode(65 + i)}</span>
+              ${q.letters === false ? '' : `<span class="letter">${String.fromCharCode(65 + i)}</span>`}
               <span class="body">
                 <div class="opt-title">${esc(opt.t)}</div>
                 <div class="opt-sub">${esc(opt.s)}</div>
