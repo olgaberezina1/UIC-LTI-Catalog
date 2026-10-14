@@ -191,21 +191,9 @@
   }
 
   // ─── Question content ──────────────────────────────────────────
-  // The finder runs 2 or 3 questions: the sub-category step appears only for
+  // The finder runs 1 or 2 questions: the sub-category step appears only for
   // categories that have more than one. Build the list from the answers so far
   // instead of indexing a fixed array.
-  const LMS_QUESTION = {
-    key: "lms",
-    label: "Where",
-    prompt: "Which LMS are you teaching in this term?",
-    multi: false,
-    options: [
-      { v: "canvas",     t: "Canvas",      s: "Current / transitional courses" },
-      { v: "blackboard", t: "Blackboard",  s: "Legacy courses" },
-      { v: null,         t: "Either, show me everything", s: "I'll filter later" },
-    ],
-  };
-
   function activeQuestions() {
     const questions = [{
       key: "category",
@@ -240,7 +228,6 @@
       });
     }
 
-    questions.push(LMS_QUESTION);
     return questions;
   }
 
@@ -256,11 +243,16 @@
   // The chosen category (narrowed by sub-category, when one was asked) names its
   // tools explicitly in FINDER_TAXONOMY, so a tool matches by name rather than by
   // its tools.json category. Tools the taxonomy doesn't list still appear, scored
-  // on LMS and Title II alone.
+  // on Title II alone.
+  //
+  // Availability is not scored: the finder no longer asks which LMS you teach in,
+  // so a tool missing from one of them ranks the same as one in both. The result
+  // cards and the catalog still show each tool's Canvas and Blackboard status,
+  // and the catalog has its own LMS filter.
 
-  function scoreTools({ category = null, subcategory = null, lms = null }) {
+  function scoreTools({ category = null, subcategory = null }) {
     const requireA11y = true;
-    const weights = { scope: 3, lms: 4, a11y: 5 };
+    const weights = { scope: 3, a11y: 5 };
     const inScope = toolsInScope(category, subcategory);
     return LTI_TOOLS.map(tool => {
       let score = 0;
@@ -271,11 +263,6 @@
         reasons.push(subcategory && subcategory !== ANY_SUBCATEGORY ? subcategory : category);
       }
 
-      if (lms === "canvas" && tool.cv === "yes") { score += weights.lms; reasons.push("Canvas-ready"); }
-      else if (lms === "blackboard" && tool.bb === "yes") { score += weights.lms; reasons.push("Blackboard-ready"); }
-      else if (lms === "canvas" && tool.cv !== "yes") { score -= weights.lms; }
-      else if (lms === "blackboard" && tool.bb !== "yes") { score -= weights.lms; }
-
       if (requireA11y && tool.t2 === "yes") { score += weights.a11y; reasons.push("Title II compliant"); }
       if (requireA11y && tool.t2 !== "yes") { score -= weights.a11y * 2; }
 
@@ -283,7 +270,6 @@
 
       const max =
         (category ? weights.scope : 0) +
-        (lms ? weights.lms : 0) +
         (requireA11y ? weights.a11y : 0);
 
       const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((score / max) * 100))) : 0;
@@ -298,7 +284,6 @@
     answers: {
       category: null,
       subcategory: null,
-      lms: null,
     },
     catalog: {
       search: '',
@@ -396,7 +381,6 @@
     const bits = [];
     if (a.subcategory && a.subcategory !== ANY_SUBCATEGORY) bits.push(a.subcategory);
     else if (a.category) bits.push(a.category);
-    if (a.lms) bits.push(a.lms);
     return bits.length ? bits.join(' / ') : 'your course';
   }
 
@@ -559,7 +543,7 @@
   }
 
   function resetAnswers() {
-    state.answers = { category: null, subcategory: null, lms: null };
+    state.answers = { category: null, subcategory: null };
     state.step = 0;
   }
 
@@ -568,7 +552,6 @@
     category: new Set(FINDER_TAXONOMY.map(c => c.name)),
     subcategory: new Set([ANY_SUBCATEGORY].concat(
       FINDER_TAXONOMY.flatMap(c => c.subcategories.map(s => s.name)))),
-    lms: new Set(['canvas','blackboard']),
   };
 
 
@@ -577,7 +560,6 @@
     const parts = [];
     if (a.category) parts.push('category=' + a.category);
     if (a.subcategory) parts.push('subcategory=' + a.subcategory);
-    if (a.lms) parts.push('lms=' + a.lms);
     if (state.screen === 'results') parts.push('view=results');
     const newHash = parts.length ? '#' + parts.join('&') : '';
     if (location.hash !== newHash) {
@@ -586,11 +568,11 @@
   }
 
   function emptyAnswers() {
-    return { category: null, subcategory: null, lms: null };
+    return { category: null, subcategory: null };
   }
 
   function hasAnyAnswer(a) {
-    return a.category !== null || a.subcategory !== null || a.lms !== null;
+    return a.category !== null || a.subcategory !== null;
   }
 
   // Walk the questions that actually apply to these answers, since the
@@ -624,7 +606,6 @@
         answers.subcategory = params.subcategory;
       }
     }
-    if (params.lms && VALID.lms.has(params.lms)) answers.lms = params.lms;
     const view = params.view === 'results' ? 'results' : null;
     return { answers, view };
   }
