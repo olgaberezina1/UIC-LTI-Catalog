@@ -12,6 +12,8 @@ import urllib.error
 import urllib.request
 import zipfile
 
+import stamp_assets
+
 SHEET_ID = "1FGY1itGZgsnpefzKDXtfqH2AZdkVCYlnQxt_IInFqXY"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=xlsx"
 SHEET_TAB = "Published"
@@ -234,6 +236,27 @@ def check_taxonomy(tools, taxonomy_names):
     ]
 
 
+def check_asset_stamps():
+    """Warn when index.html's cache-busting versions trail the assets.
+
+    Not fatal, and nothing to do with the sheet: a stale stamp means visitors
+    may run an older app.js or styles.css for up to ten minutes, not that the
+    catalog is wrong. Checked here because a sync is the routine moment someone
+    looks at this script's output.
+    """
+    try:
+        html = stamp_assets.read_index()
+        _, changes = stamp_assets.stamp(html, stamp_assets.asset_versions())
+    except stamp_assets.StampError as error:
+        return [f"could not check index.html asset versions: {error}"]
+
+    return [
+        f"index.html asset version is stale ({change}) — "
+        "run scripts/stamp_assets.py"
+        for change in changes
+    ]
+
+
 DIFF_FIELDS = ("desc", "category", "bb", "cv", "t2", "video", "videoTitle")
 
 
@@ -400,6 +423,7 @@ def main(argv=None):
     # The finder's taxonomy is maintained by hand alongside this generated file;
     # a rename on the sheet aborts here rather than silently breaking the finder.
     warnings += check_taxonomy(tools, taxonomy_tool_names())
+    warnings += check_asset_stamps()
     for warning in warnings:
         print(f"warning: {warning}")
 

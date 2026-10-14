@@ -27,7 +27,9 @@ UIC-LTI-Catalog/
 ├── tools.json     — catalog data, generated from the Google Sheet
 └── scripts/
     ├── sync_catalog.py       — regenerates tools.json from the sheet
-    └── test_sync_catalog.py  — unit tests for the sync script
+    ├── test_sync_catalog.py  — unit tests for the sync script
+    ├── stamp_assets.py       — cache-busting versions for index.html's links
+    └── test_stamp_assets.py  — unit tests for the stamper
 ```
 
 ---
@@ -164,9 +166,20 @@ shows a catalog. Serve it instead:
 
     python3 -m http.server 8000    # then http://localhost:8000
 
-### Running the script's tests
+### After editing app.js or styles.css
 
-    cd scripts && python3 -m unittest test_sync_catalog -v
+Re-stamp `index.html`'s asset links so caches can't serve a mismatched set:
+
+    python3 scripts/stamp_assets.py
+
+GitHub Pages sends `Cache-Control: max-age=600` on every file, cached
+independently, so an unstamped `index.html` can pair with a ten-minute-old
+`app.js`. `--check` reports staleness without rewriting, and a sync warns about
+it. `tools.json` needs no stamp — `app.js` fetches it with `cache: 'no-cache'`.
+
+### Running the scripts' tests
+
+    cd scripts && python3 -m unittest discover -p "test_*.py"
 
 ---
 

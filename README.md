@@ -19,6 +19,8 @@ catalog table.
 | `tools.json` | Catalog data, **generated** from the Google Sheet. Never edit by hand |
 | `scripts/sync_catalog.py` | Regenerates `tools.json` from the sheet, commits and pushes it |
 | `scripts/test_sync_catalog.py` | Unit tests for the sync script |
+| `scripts/stamp_assets.py` | Stamps content-hash versions onto index.html's asset links |
+| `scripts/test_stamp_assets.py` | Unit tests for the stamper |
 | `slides/` | Presentation deck about how the site was built |
 | `PROJECT.md` | Detailed documentation: data schema, status codes, finder scoring, design decisions |
 
@@ -79,10 +81,28 @@ an empty catalog. Serve the folder instead:
 python3 -m http.server 8000        # then open http://localhost:8000
 ```
 
+## After editing app.js or styles.css
+
+Stamp the new content hashes onto `index.html`'s links:
+
+```bash
+python3 scripts/stamp_assets.py
+```
+
+GitHub Pages serves everything with `Cache-Control: max-age=600`, and each file
+is cached independently, so without this a visitor can run a fresh `index.html`
+against a ten-minute-old `app.js`. The hash means that whenever someone does get
+a new `index.html`, the assets it names are fetched fresh rather than served from
+cache. It doesn't make deploys instant — `index.html` itself can still be up to
+ten minutes stale — but what a visitor runs is always internally consistent.
+
+`tools.json` is not stamped: `app.js` fetches it with `cache: 'no-cache'`, which
+revalidates on every load. A sync warns if the stamps have fallen behind.
+
 ## Running the tests
 
 ```bash
-cd scripts && python3 -m unittest test_sync_catalog -v
+cd scripts && python3 -m unittest discover -p "test_*.py"
 ```
 
 The tests that read a real workbook are skipped automatically when openpyxl
