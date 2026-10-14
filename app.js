@@ -31,37 +31,217 @@
     "—": "—",
   };
 
-  // ─── Question content (ported from prototype.jsx QUESTIONS_FULL) ──
-  const QUESTIONS = [
-    {
-      key: "goals",
-      eyebrow: "Question 01 — Pedagogy",
-      prompt: "What do you want students to do?",
-      sub: "Pick all that apply — we'll weight them in your match.",
-      multi: true,
-      columns: 2,
-      options: [
-        { v: "polling",     t: "Respond live",          s: "Polls, clickers, real-time questions" },
-        { v: "discussion",  t: "Discuss & annotate",    s: "Threaded discussion, Q&A, social annotation" },
-        { v: "practice",    t: "Practice problems",     s: "Adaptive or low-stakes homework" },
-        { v: "high-stakes", t: "Sit a high-stakes exam",s: "Proctored or secure testing" },
-        { v: "writing",     t: "Write & get feedback",  s: "Originality, grading, essays" },
-        { v: "video",       t: "Engage with video",     s: "Lecture capture, captioned media" },
-        { v: "lab",         t: "Run a lab or simulation", s: "Virtual labs, science protocols" },
-      ],
-    },
-    {
-      key: "lms",
-      eyebrow: "Question 02 — Where",
-      prompt: "Which LMS are you teaching in this term?",
-      multi: false,
-      options: [
-        { v: "canvas",     t: "Canvas",      s: "Current / transitional courses" },
-        { v: "blackboard", t: "Blackboard",  s: "Legacy courses" },
-        { v: null,         t: "Either, show me everything", s: "I'll filter later" },
-      ],
-    },
+  // ─── Finder taxonomy ───────────────────────────────────────────
+  // Category -> sub-category -> tools. This is UI configuration, not tool data:
+  // the sheet behind tools.json has no sub-categories, so this tree is
+  // maintained by hand. Tool names must match tools.json exactly —
+  // checkTaxonomy() warns on drift at startup.
+  //
+  // Seeded from "Find My Tool LTIs Categories.xlsx", which covered 44 of the 60
+  // tools, then extended so every tool is reachable. It diverges from that
+  // spreadsheet in three ways, recorded here so the next edit knows what is
+  // deliberate:
+  //   1. Two typos corrected — "Sepecific", and a missing space in "&Credentials".
+  //   2. The other 16 tools placed into existing sub-categories.
+  //   3. Three containers added for tools the spreadsheet had nowhere to put:
+  //      "Health Sciences" (ATI Testing), and the "Access & Compliance" category
+  //      for the two campus services that aren't courseware at all — ACS Lab
+  //      Safety UIC and the campus Virtual Machine.
+  const FINDER_TAXONOMY = [
+    { name: "Engagement & Participation", subcategories: [
+      { name: "Attendance Tracking", tools: [
+        "Acadly",
+        "iClicker",
+        "Canvas Attendance",
+        "Photo Roster",
+        "Top hat",
+      ] },
+      { name: "Survey & Polling", tools: [
+        "Acadly",
+        "Turning Technologies (PointSolutions)",
+        "iClicker",
+        "Poll Everywhere",
+        "Top hat",
+      ] },
+    ] },
+    { name: "Content Creation & Interactive Learning", subcategories: [
+      { name: "Video Recording & Hosting", tools: ["Panopto", "Echo360", "Canvas Studio"] },
+      { name: "Interactive Course Content", tools: ["Soft Chalk Cloud", "Acadly", "SCORM"] },
+    ] },
+    { name: "Collaboration & Communication", subcategories: [
+      { name: "Interactive Whiteboard & Visual Workspace", tools: ["Lucid"] },
+      { name: "Discussion & Annotation", tools: [
+        "Canvas Studio",
+        "Panopto",
+        "Perusall",
+        "Piazza",
+        "Packback",
+      ] },
+      { name: "Video Conferencing", tools: ["Zoom"] },
+    ] },
+    { name: "Courseware & Publisher Content", subcategories: [
+      { name: "e-Textbooks & Course Materials", tools: [
+        "Follett My Materials",
+        "Elsevier (Evolve)",
+        "Cengage Gateway",
+        "SAGE Vantage",
+        "Wiley (WileyPLUS)",
+        "Zybooks",
+        "Pearson Access",
+        "Redshelf",
+        "Runestone",
+      ] },
+      { name: "Integrated Learning Platforms", tools: [
+        "Lingco",
+        "Alexander Street",
+        "McGraw Hill Connect",
+        "MNV Gateway (Macmillan Achieve)",
+      ] },
+    ] },
+    { name: "Assessment & Grading", subcategories: [
+      { name: "Grading", tools: [
+        "Gradescope",
+        "ILP Grading",
+        "PrairieLearn",
+        "Canvas Moderated Grading",
+      ] },
+      { name: "Quizzes", tools: ["InQuizitive (W.W. Norton)"] },
+      { name: "Secure & Proctored Testing", tools: [
+        "ExamSoft Enterprise",
+        "Respondus LockDown Browser",
+      ] },
+    ] },
+    { name: "Learning Analytics & Credentials", subcategories: [
+      { name: "Course Analytics", tools: [
+        "Canvas Intelligent Insights",
+        "ClassRanked",
+        "Anthology Course Evaluations",
+      ] },
+      { name: "Digital Badges & Credentials", tools: ["Parchment Digital Badges"] },
+    ] },
+    { name: "Professional Development", subcategories: [
+      { name: "Skills Training", tools: ["LinkedIn Learning", "Coursera"] },
+    ] },
+    { name: "Academic Integrity", subcategories: [
+      { name: "Plagiarism & Similarity Checking", tools: ["iThenticate", "TurnitIn"] },
+    ] },
+    { name: "Discipline-Specific Courseware", subcategories: [
+      { name: "STEM", tools: [
+        "Aleks",
+        "Labflow",
+        "The Expertta (Expert TA)",
+        "Zybooks",
+        "Apollo Codio",
+        "Holscience",
+        "Matlab",
+        "MyOpenMath",
+        "OpenOChem",
+        "Runestone",
+      ] },
+      { name: "Business", tools: ["Stukent", "myBusinessCourse"] },
+      { name: "Health Sciences", tools: ["ATI Testing"] },
+    ] },
+    { name: "Accessibility", subcategories: [
+      { name: "Accessibility", tools: ["Panorama", "Ally"] },
+    ] },
+    { name: "Access & Compliance", subcategories: [
+      { name: "Lab Safety & Compliance", tools: ["ACS Lab Safety UIC"] },
+      { name: "Computing Access", tools: ["Virtual Machine"] },
+    ] },
   ];
+
+  // Chosen when someone wants a whole category rather than one sub-category.
+  // A real value, not null, so "no preference" stays distinct from "unanswered".
+  const ANY_SUBCATEGORY = "__any__";
+
+  function categoryByName(name) {
+    return FINDER_TAXONOMY.find(c => c.name === name) || null;
+  }
+
+  // The sub-category question applies only where a category has more than one.
+  // Three categories have a single sub-category, which would be a dead step.
+  function subcategoriesFor(categoryName) {
+    const cat = categoryByName(categoryName);
+    return cat && cat.subcategories.length > 1 ? cat.subcategories : [];
+  }
+
+  // The tools in the narrowest scope chosen so far.
+  function toolsInScope(categoryName, subcategoryName) {
+    const cat = categoryByName(categoryName);
+    if (!cat) return new Set();
+    const picked = (subcategoryName && subcategoryName !== ANY_SUBCATEGORY)
+      ? cat.subcategories.filter(s => s.name === subcategoryName)
+      : cat.subcategories;
+    return new Set(picked.flatMap(s => s.tools));
+  }
+
+  function countTools(categoryName) {
+    return toolsInScope(categoryName, null).size;
+  }
+
+  // Warn if the taxonomy names a tool the catalog no longer has — the two are
+  // maintained separately, so they drift silently otherwise.
+  function checkTaxonomy() {
+    const known = new Set(LTI_TOOLS.map(t => t.name));
+    const unknown = [...new Set(FINDER_TAXONOMY.flatMap(
+      c => c.subcategories.flatMap(s => s.tools)))].filter(n => !known.has(n));
+    if (unknown.length) {
+      console.warn('Finder taxonomy names tools absent from tools.json:', unknown);
+    }
+  }
+
+  // ─── Question content ──────────────────────────────────────────
+  // The finder runs 2 or 3 questions: the sub-category step appears only for
+  // categories that have more than one. Build the list from the answers so far
+  // instead of indexing a fixed array.
+  const LMS_QUESTION = {
+    key: "lms",
+    label: "Where",
+    prompt: "Which LMS are you teaching in this term?",
+    multi: false,
+    options: [
+      { v: "canvas",     t: "Canvas",      s: "Current / transitional courses" },
+      { v: "blackboard", t: "Blackboard",  s: "Legacy courses" },
+      { v: null,         t: "Either, show me everything", s: "I'll filter later" },
+    ],
+  };
+
+  function activeQuestions() {
+    const questions = [{
+      key: "category",
+      label: "Category",
+      prompt: "What do you want students to do?",
+      sub: "Pick the area closest to what you have in mind.",
+      multi: false,
+      columns: 2,
+      options: FINDER_TAXONOMY.map(cat => ({
+        v: cat.name,
+        t: cat.name,
+        s: `${countTools(cat.name)} ${countTools(cat.name) === 1 ? 'tool' : 'tools'}`,
+      })),
+    }];
+
+    const subcategories = subcategoriesFor(state.answers.category);
+    if (subcategories.length) {
+      questions.push({
+        key: "subcategory",
+        label: "Narrow it down",
+        prompt: `Which part of ${state.answers.category}?`,
+        multi: false,
+        columns: 2,
+        options: subcategories.map(s => ({
+          v: s.name,
+          t: s.name,
+          s: `${s.tools.length} ${s.tools.length === 1 ? 'tool' : 'tools'}`,
+        })).concat([
+          { v: ANY_SUBCATEGORY, t: "No preference", s: "Show the whole category" },
+        ]),
+      });
+    }
+
+    questions.push(LMS_QUESTION);
+    return questions;
+  }
 
   // Tiny HTML-escape helper for any interpolated text. Tool data is external —
   // fetched from tools.json, generated from a spreadsheet — so escaping is required.
@@ -72,40 +252,23 @@
   }
 
   // ─── 2. Scoring ──────────────────────────────────────────────
-  // Goals match a tool by its `category`, via GOAL_CATEGORIES below.
-  // Which sheet categories satisfy each finder goal. This is UI configuration,
-  // not tool data — the sheet stays the only per-tool source. A category that
-  // appears here nowhere simply never matches a goal; those tools still show in
-  // the catalog and still score on LMS and Title II.
-  const GOAL_CATEGORIES = {
-    polling: [
-      "Engagement & Classroom Response Systems",
-      "Student Engagement & Classroom Management",
-      "Engagement & Participation Tracking",
-    ],
-    discussion: ["Collaboration & Communication"],
-    practice: ["Assessment & Testing", "Content Delivery & Digital Textbooks"],
-    "high-stakes": [
-      "Assessment Security & Academic Integrity",
-      "Assessment & Testing",
-      "Academic Integrity & Plagiarism Prevention",
-    ],
-    writing: ["Academic Integrity & Plagiarism Prevention", "Assessment & Grading Tools"],
-    video: ["Media & Content Creation", "Multimedia Collaboration & Visual Tools"],
-    lab: ["Specialized Academic Platforms", "Safety & Compliance"],
-  };
+  // The chosen category (narrowed by sub-category, when one was asked) names its
+  // tools explicitly in FINDER_TAXONOMY, so a tool matches by name rather than by
+  // its tools.json category. Tools the taxonomy doesn't list still appear, scored
+  // on LMS and Title II alone.
 
-  function scoreTools({ goals = [], lms = null }) {
+  function scoreTools({ category = null, subcategory = null, lms = null }) {
     const requireA11y = true;
-    const weights = { goal: 3, lms: 4, a11y: 5 };
+    const weights = { scope: 3, lms: 4, a11y: 5 };
+    const inScope = toolsInScope(category, subcategory);
     return LTI_TOOLS.map(tool => {
       let score = 0;
       const reasons = [];
 
-      goals.forEach(g => {
-        const categories = GOAL_CATEGORIES[g] || [];
-        if (categories.includes(tool.category)) { score += weights.goal; reasons.push(g); }
-      });
+      if (inScope.has(tool.name)) {
+        score += weights.scope;
+        reasons.push(subcategory && subcategory !== ANY_SUBCATEGORY ? subcategory : category);
+      }
 
       if (lms === "canvas" && tool.cv === "yes") { score += weights.lms; reasons.push("Canvas-ready"); }
       else if (lms === "blackboard" && tool.bb === "yes") { score += weights.lms; reasons.push("Blackboard-ready"); }
@@ -118,7 +281,7 @@
       if (tool.bb === "retired" && tool.cv === "retired") score -= 10;
 
       const max =
-        goals.length * weights.goal +
+        (category ? weights.scope : 0) +
         (lms ? weights.lms : 0) +
         (requireA11y ? weights.a11y : 0);
 
@@ -132,7 +295,8 @@
     screen: 'hero',
     step: 0,
     answers: {
-      goals: [],
+      category: null,
+      subcategory: null,
       lms: null,
     },
     catalog: {
@@ -158,8 +322,10 @@
   }
 
   function renderFinder() {
-    const q = QUESTIONS[state.step];
-    const total = QUESTIONS.length;
+    const questions = activeQuestions();
+    if (state.step >= questions.length) state.step = questions.length - 1;
+    const q = questions[state.step];
+    const total = questions.length;
     const value = state.answers[q.key];
     const isLast = state.step === total - 1;
     const isMulti = !!q.multi;
@@ -169,13 +335,14 @@
 
     // Progress bars
     const progress = document.getElementById('progress');
-    progress.innerHTML = QUESTIONS.map((_, i) => {
+    progress.innerHTML = questions.map((_, i) => {
       const cls = i < state.step ? 'is-past' : i === state.step ? 'is-current' : '';
       return `<div class="${cls}"></div>`;
     }).join('');
 
     // Eyebrow + counter
-    document.getElementById('q-eyebrow').textContent = q.eyebrow;
+    document.getElementById('q-eyebrow').textContent =
+      `Question 0${state.step + 1} — ${q.label}`;
     document.getElementById('q-counter').textContent =
       `0${state.step + 1} / 0${total}`;
 
@@ -227,7 +394,8 @@
   function querySummary() {
     const a = state.answers;
     const bits = [];
-    if (a.goals && a.goals.length) bits.push(a.goals.slice(0, 2).join(' + '));
+    if (a.subcategory && a.subcategory !== ANY_SUBCATEGORY) bits.push(a.subcategory);
+    else if (a.category) bits.push(a.category);
     if (a.lms) bits.push(a.lms);
     return bits.length ? bits.join(' / ') : 'your course';
   }
@@ -391,20 +559,24 @@
   }
 
   function resetAnswers() {
-    state.answers = { goals: [], lms: null };
+    state.answers = { category: null, subcategory: null, lms: null };
     state.step = 0;
   }
 
-  // Allowed values for hash validation
+  // Allowed values for hash validation, straight from the taxonomy.
   const VALID = {
-    goals: new Set(['polling','discussion','practice','high-stakes','writing','video','lab']),
+    category: new Set(FINDER_TAXONOMY.map(c => c.name)),
+    subcategory: new Set([ANY_SUBCATEGORY].concat(
+      FINDER_TAXONOMY.flatMap(c => c.subcategories.map(s => s.name)))),
     lms: new Set(['canvas','blackboard']),
   };
+
 
   function syncHash() {
     const a = state.answers;
     const parts = [];
-    if (a.goals && a.goals.length) parts.push('goals=' + a.goals.join(','));
+    if (a.category) parts.push('category=' + a.category);
+    if (a.subcategory) parts.push('subcategory=' + a.subcategory);
     if (a.lms) parts.push('lms=' + a.lms);
     if (state.screen === 'results') parts.push('view=results');
     const newHash = parts.length ? '#' + parts.join('&') : '';
@@ -414,17 +586,19 @@
   }
 
   function emptyAnswers() {
-    return { goals: [], lms: null };
+    return { category: null, subcategory: null, lms: null };
   }
 
   function hasAnyAnswer(a) {
-    return (a.goals && a.goals.length > 0) || a.lms !== null;
+    return a.category !== null || a.subcategory !== null || a.lms !== null;
   }
 
+  // Walk the questions that actually apply to these answers, since the
+  // sub-category step is present for some categories and absent for others.
   function firstUnansweredStep(a) {
-    if (!a.goals || a.goals.length === 0) return 0;
-    if (a.lms === null) return 1;
-    return QUESTIONS.length - 1;
+    const questions = activeQuestions();
+    const at = questions.findIndex(q => a[q.key] === null || a[q.key] === undefined);
+    return at === -1 ? questions.length - 1 : at;
   }
 
   function readHash() {
@@ -440,8 +614,15 @@
 
     const answers = emptyAnswers();
 
-    if (params.goals) {
-      answers.goals = params.goals.split(',').filter(g => VALID.goals.has(g));
+    if (params.category && VALID.category.has(params.category)) {
+      answers.category = params.category;
+    }
+    if (params.subcategory && VALID.subcategory.has(params.subcategory)) {
+      // Only keep a sub-category that belongs to the category in the same link.
+      const owned = subcategoriesFor(answers.category).some(s => s.name === params.subcategory);
+      if (owned || params.subcategory === ANY_SUBCATEGORY) {
+        answers.subcategory = params.subcategory;
+      }
     }
     if (params.lms && VALID.lms.has(params.lms)) answers.lms = params.lms;
     const view = params.view === 'results' ? 'results' : null;
@@ -482,6 +663,10 @@
       syncHash();
       render();
     } else {
+      // A different category means its sub-categories differ too.
+      if (key === 'category' && state.answers.category !== value) {
+        state.answers.subcategory = null;
+      }
       state.answers[key] = value;
       syncHash();
       render();
@@ -490,7 +675,7 @@
   }
 
   function advance() {
-    if (state.step === QUESTIONS.length - 1) {
+    if (state.step === activeQuestions().length - 1) {
       goToScreen('results');
     } else {
       goToStep(state.step + 1);
@@ -509,6 +694,9 @@
         '<tr><td colspan="5">Catalog failed to load. Please refresh the page.</td></tr>';
       return;
     }
+
+    // The taxonomy and the catalog are maintained separately; say so if they drift.
+    checkTaxonomy();
 
     // Populate hero count from data
     document.getElementById('hero-count').textContent =
