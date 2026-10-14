@@ -389,5 +389,95 @@ class ReadRowsTest(unittest.TestCase):
             self.assertIn(sc.COL_DESC, str(ctx.exception))
 
 
+
+SAMPLE_APP_JS = """
+(function () {
+  'use strict';
+  const AVAIL_LABEL = { yes: "Yes" };
+
+  const FINDER_TAXONOMY = [
+    { name: "Engagement & Participation", subcategories: [
+      { name: "Attendance Tracking", tools: ["Acadly", "iClicker"] },
+      { name: "Survey & Polling", tools: [
+        "Acadly",
+        "Turning Technologies (PointSolutions)",
+      ] },
+    ] },
+    { name: "Accessibility", subcategories: [
+      { name: "Accessibility", tools: ["Panorama"] },
+    ] },
+  ];
+
+  const ANY_SUBCATEGORY = "__any__";
+})();
+"""
+
+
+class TaxonomyToolNamesTest(unittest.TestCase):
+    def write(self, body):
+        handle = tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8")
+        handle.write(body)
+        handle.close()
+        self.addCleanup(os.unlink, handle.name)
+        return handle.name
+
+    def test_reads_names_from_single_and_multi_line_arrays(self):
+        self.assertEqual(
+            sc.taxonomy_tool_names(self.write(SAMPLE_APP_JS)),
+            {"Acadly", "iClicker", "Turning Technologies (PointSolutions)", "Panorama"},
+        )
+
+    def test_ignores_category_and_sub_category_names(self):
+        names = sc.taxonomy_tool_names(self.write(SAMPLE_APP_JS))
+        self.assertNotIn("Attendance Tracking", names)
+        self.assertNotIn("Accessibility", names)
+
+    def test_raises_when_the_array_is_missing(self):
+        path = self.write("(function () { const SOMETHING_ELSE = []; })();")
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.taxonomy_tool_names(path)
+        self.assertIn("FINDER_TAXONOMY", str(ctx.exception))
+
+    def test_raises_when_the_file_is_missing(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.taxonomy_tool_names("/nonexistent/app.js")
+        self.assertIn("not found", str(ctx.exception))
+
+
+class CheckTaxonomyTest(unittest.TestCase):
+    def test_silent_when_catalog_and_taxonomy_agree(self):
+        tools = [tool("Acadly"), tool("Panorama")]
+        self.assertEqual(sc.check_taxonomy(tools, {"Acadly", "Panorama"}), [])
+
+    def test_raises_naming_a_tool_the_catalog_lost(self):
+        # The rename case: the sheet now calls it something else, so the
+        # taxonomy entry would score nothing.
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.check_taxonomy([tool("Follett My Materials")], {"Follett Discovery"})
+        message = str(ctx.exception)
+        self.assertIn("Follett Discovery", message)
+        self.assertIn("app.js", message)
+
+    def test_lists_every_stale_name(self):
+        with self.assertRaises(sc.SyncError) as ctx:
+            sc.check_taxonomy([tool("Acadly")], {"Acadly", "Gone One", "Gone Two"})
+        message = str(ctx.exception)
+        self.assertIn("Gone One", message)
+        self.assertIn("Gone Two", message)
+
+    def test_warns_without_raising_for_a_tool_the_taxonomy_omits(self):
+        # A new tool on the sheet shouldn't block the sync — it just isn't
+        # reachable through the finder's questions yet.
+        warnings = sc.check_taxonomy([tool("Acadly"), tool("Brand New")], {"Acadly"})
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("Brand New", warnings[0])
+        self.assertIn("cannot reach it", warnings[0])
+
+    def test_warnings_are_sorted(self):
+        warnings = sc.check_taxonomy(
+            [tool("Zeta"), tool("Alpha"), tool("Acadly")], {"Acadly"})
+        self.assertTrue(warnings[0].startswith("Alpha"))
+        self.assertTrue(warnings[1].startswith("Zeta"))
+
 if __name__ == "__main__":
     unittest.main()

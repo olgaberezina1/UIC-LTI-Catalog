@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -17,6 +18,7 @@ SHEET_TAB = "Published"
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_JSON = os.path.join(REPO_ROOT, "tools.json")
+APP_JS = os.path.join(REPO_ROOT, "app.js")
 
 MIN_TOOLS = 40
 
@@ -170,6 +172,66 @@ def build_catalog(rows):
             f"Refusing to empty the catalog."
         )
     return tools, warnings
+
+
+def taxonomy_tool_names(path=None):
+    """The tool names listed in app.js's FINDER_TAXONOMY.
+
+    Find My Tool's category tree is hand-maintained JavaScript, not generated
+    from the sheet, so the two can drift apart. Rather than teach this script to
+    parse JavaScript, lift the names with a regex: every entry sits in a
+    `tools: [...]` array of double-quoted strings.
+    """
+    source_path = path or APP_JS
+    try:
+        with open(source_path, encoding="utf-8") as handle:
+            source = handle.read()
+    except FileNotFoundError:
+        raise SyncError(f"{source_path} not found — cannot check the finder taxonomy.")
+
+    block = re.search(r"const FINDER_TAXONOMY = \[(.*?)\n  \];", source, re.S)
+    if not block:
+        raise SyncError(
+            f"no FINDER_TAXONOMY array found in {source_path}. The finder's "
+            f"category tree was renamed, reformatted or removed; this check "
+            f"cannot verify the catalog against it."
+        )
+
+    names = set()
+    for array in re.findall(r"tools:\s*\[(.*?)\]", block.group(1), re.S):
+        names.update(re.findall(r'"((?:[^"\\]|\\.)*)"', array))
+    return names
+
+
+def check_taxonomy(tools, taxonomy_names):
+    """Compare the finder taxonomy against the catalog about to be written.
+
+    Returns non-fatal warnings for catalog tools the taxonomy doesn't list —
+    they stay browsable and searchable, they just aren't reachable by answering
+    the finder's questions.
+
+    Raises when the taxonomy names a tool the catalog no longer has. That entry
+    is dead: the finder would offer a sub-category that scores nothing. A rename
+    on the sheet has to land in app.js too, so stop rather than publish a
+    catalog the finder half points at.
+    """
+    catalog = {t["name"] for t in tools}
+
+    stale = sorted(taxonomy_names - catalog)
+    if stale:
+        raise SyncError(
+            "the finder taxonomy in app.js names "
+            f"{len(stale)} tool(s) this catalog does not have: "
+            f"{', '.join(stale)}. They were probably renamed or removed on the "
+            "sheet. Update FINDER_TAXONOMY to match and re-run — refusing to "
+            "publish a catalog the finder points away from."
+        )
+
+    return [
+        f"{name}: in the catalog but absent from FINDER_TAXONOMY in app.js — "
+        "Find My Tool cannot reach it"
+        for name in sorted(catalog - taxonomy_names)
+    ]
 
 
 DIFF_FIELDS = ("desc", "category", "bb", "cv", "t2", "video", "videoTitle")
@@ -335,6 +397,9 @@ def main(argv=None):
         rows = read_rows(xlsx)
 
     tools, warnings = build_catalog(rows)
+    # The finder's taxonomy is maintained by hand alongside this generated file;
+    # a rename on the sheet aborts here rather than silently breaking the finder.
+    warnings += check_taxonomy(tools, taxonomy_tool_names())
     for warning in warnings:
         print(f"warning: {warning}")
 
