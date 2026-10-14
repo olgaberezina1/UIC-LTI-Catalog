@@ -213,7 +213,8 @@
       prompt: "What do you want students to do?",
       sub: "Pick the area closest to what you have in mind.",
       multi: false,
-      columns: 2,
+      // Three across: 11 categories in 4 rows rather than 6.
+      columns: 3,
       options: FINDER_TAXONOMY.map(cat => ({
         v: cat.name,
         t: cat.name,
@@ -351,7 +352,7 @@
     slot.innerHTML = `
       <h1 class="q-prompt serif">${esc(q.prompt)}</h1>
       ${q.sub ? `<p class="q-sub">${esc(q.sub)}</p>` : ''}
-      <div class="options ${q.columns === 2 ? 'cols-2' : ''}">
+      <div class="options ${q.columns ? 'cols-' + q.columns : ''}">
         ${q.options.map((opt, i) => {
           const selected = isMulti
             ? Array.isArray(value) && value.includes(opt.v)

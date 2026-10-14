@@ -294,6 +294,10 @@ main[data-screen="results"] > .screen-finder {
   grid-template-columns: 1fr 1fr;
   max-width: 900px;
 }
+.options.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 1120px;
+}
 
 .option-card {
   display: flex; align-items: center; gap: 18px;
@@ -514,6 +518,7 @@ main[data-screen="results"] > .screen-finder {
 /* ─── Responsive ──────────────────────────────────────────────── */
 
 @media (max-width: 840px) {
+  .options.cols-3 { grid-template-columns: 1fr 1fr; }
   .screen-hero {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -601,6 +606,7 @@ main[data-screen="results"] > .screen-finder {
 }
 
 @media (max-width: 380px) {
-  .options.cols-2 { grid-template-columns: 1fr; }
+  .options.cols-2,
+  .options.cols-3 { grid-template-columns: 1fr; }
   .hero-bullets { gap: 8px; }
 }
