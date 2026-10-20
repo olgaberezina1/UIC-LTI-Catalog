@@ -227,42 +227,30 @@
     }[c]));
   }
 
-  // ─── 2. Scoring ──────────────────────────────────────────────
+  // ─── 2. Matching ─────────────────────────────────────────────
   // The chosen category (narrowed by sub-category, when one was asked) names its
   // tools explicitly in FINDER_TAXONOMY, so a tool matches by name rather than by
-  // its tools.json category. Tools the taxonomy doesn't list still appear, scored
-  // on Title II alone.
+  // its tools.json category.
   //
-  // Availability is not scored: the finder no longer asks which LMS you teach in,
-  // so a tool missing from one of them ranks the same as one in both. The result
-  // cards and the catalog still show each tool's Canvas and Blackboard status,
-  // and the catalog has its own LMS filter.
+  // Results are not ranked. Every tool in the chosen scope is an equally valid
+  // answer, so they are listed alphabetically and nothing implies one is a better
+  // pick than another. Title II status and LMS availability are shown on every
+  // card rather than used to order them — the catalog has its own filters for
+  // narrowing on either.
 
-  function scoreTools({ category = null, subcategory = null }) {
-    const requireA11y = true;
-    const weights = { scope: 3, a11y: 5 };
+  function matchTools({ category = null, subcategory = null }) {
     const inScope = toolsInScope(category, subcategory);
-    return LTI_TOOLS.map(tool => {
-      let score = 0;
-      const reasons = [];
+    const scopeLabel =
+      subcategory && subcategory !== ANY_SUBCATEGORY ? subcategory : category;
 
-      if (inScope.has(tool.name)) {
-        score += weights.scope;
-        reasons.push(subcategory && subcategory !== ANY_SUBCATEGORY ? subcategory : category);
-      }
-
-      if (requireA11y && tool.t2 === "yes") { score += weights.a11y; reasons.push("Title II compliant"); }
-      if (requireA11y && tool.t2 !== "yes") { score -= weights.a11y * 2; }
-
-      if (tool.bb === "retired" && tool.cv === "retired") score -= 10;
-
-      const max =
-        (category ? weights.scope : 0) +
-        (requireA11y ? weights.a11y : 0);
-
-      const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((score / max) * 100))) : 0;
-      return { ...tool, score, pct, reasons: [...new Set(reasons)] };
-    }).sort((a, b) => b.score - a.score);
+    return LTI_TOOLS
+      .filter(tool => inScope.has(tool.name))
+      .map(tool => {
+        const reasons = [scopeLabel];
+        if (tool.t2 === "yes") reasons.push("Title II compliant");
+        return { ...tool, reasons };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   // ─── 3. State ──────────────────────────────────────────────────
@@ -382,45 +370,32 @@
     return `<span class="avail ${cls}"><span class="pip"></span>${esc(label)}</span>`;
   }
 
-  function resultCardMarkup(t, rank, hero) {
+  function resultCardMarkup(t) {
     return `
-      <div class="result-card${hero ? ' is-hero' : ''}">
-        <div>
-          <div class="result-rank">${String(rank).padStart(2, '0')}</div>
-          ${hero ? '<div class="result-top-pick">TOP PICK</div>' : ''}
+      <div class="result-card">
+        <div class="result-tags-line">
+          <div class="result-name">${esc(t.name)}</div>
+          <div class="result-tag-list">${esc(t.category)}</div>
         </div>
-        <div>
-          <div class="result-tags-line">
-            <div class="result-name">${esc(t.name)}</div>
-            <div class="result-tag-list">${esc(t.category)}</div>
-          </div>
-          <p class="result-desc">${esc(t.desc)}</p>
-          <div class="result-avail-row">
-            <span class="avail-lms-label">Canvas</span>${availMarkup(t.cv)}
-            <span class="sep">·</span>
-            <span class="avail-lms-label">Blackboard</span>${availMarkup(t.bb)}
-            <span class="sep">·</span>
-            <span class="result-t2">Title II: <strong>${t.t2 === 'yes' ? 'Compliant' : t.t2 === 'no' ? 'No' : '—'}</strong></span>
-          </div>
-          ${(t.reasons && t.reasons.length) ? `
-            <div class="result-why">
-              <span class="why-label">Why →</span>
-              ${t.reasons.slice(0, 5).map(r => `<span class="tag">${esc(r)}</span>`).join('')}
-            </div>` : ''}
+        <p class="result-desc">${esc(t.desc)}</p>
+        <div class="result-avail-row">
+          <span class="avail-lms-label">Canvas</span>${availMarkup(t.cv)}
+          <span class="sep">·</span>
+          <span class="avail-lms-label">Blackboard</span>${availMarkup(t.bb)}
+          <span class="sep">·</span>
+          <span class="result-t2">Title II: <strong>${t.t2 === 'yes' ? 'Compliant' : t.t2 === 'no' ? 'No' : '—'}</strong></span>
         </div>
+        ${(t.reasons && t.reasons.length) ? `
+          <div class="result-why">
+            <span class="why-label">Why →</span>
+            ${t.reasons.slice(0, 5).map(r => `<span class="tag">${esc(r)}</span>`).join('')}
+          </div>` : ''}
       </div>
     `;
   }
 
   function renderResults() {
-    const ranked = scoreTools(state.answers);
-
-    // scoreTools ranks the whole catalog, so take only what the chosen scope
-    // holds — otherwise, once the scope runs out, unrelated tools fill the
-    // remaining slots and the count promised on the option card is a lie.
-    // Every match gets a card, so the count on the option card is what you see.
-    const inScope = toolsInScope(state.answers.category, state.answers.subcategory);
-    const matches = inScope.size ? ranked.filter(t => inScope.has(t.name)) : ranked.slice(0, 6);
+    const matches = matchTools(state.answers);
 
     document.getElementById('results-count').textContent =
       `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
@@ -429,7 +404,7 @@
       `Built for <em>${esc(querySummary())}</em>.`;
 
     document.getElementById('results-top').innerHTML =
-      matches.map((t, i) => resultCardMarkup(t, i + 1, i === 0)).join('');
+      matches.map(t => resultCardMarkup(t)).join('');
   }
 
   function rowsForCatalog() {

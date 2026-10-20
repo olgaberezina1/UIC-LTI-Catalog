@@ -357,38 +357,16 @@ main[data-screen="results"] > .screen-finder {
 
 .result-card {
   padding: 22px 26px;
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 26px;
-  align-items: start;
   background: white;
   border: 1px solid var(--line);
 }
-.result-card.is-hero {
-  padding: 28px 32px;
-  border-color: var(--ink);
-  border-width: 2px;
-  border-left: 6px solid var(--crimson);
-}
-.result-rank {
-  font-family: var(--serif); font-style: italic;
-  font-size: 40px; color: var(--ink-3); line-height: 1;
-}
-.result-card.is-hero .result-rank { font-size: 52px; color: var(--ink); }
-.result-top-pick {
-  font-family: var(--mono);
-  font-size: 9px; color: var(--crimson);
-  letter-spacing: 0.12em; margin-top: 8px; font-weight: 700;
-}
 .result-name { font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--ink); }
-.result-card.is-hero .result-name { font-size: 32px; }
 .result-tags-line { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .result-tag-list {
   font-family: var(--mono); color: var(--ink-3);
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
 }
 .result-desc { margin: 10px 0 14px; color: var(--ink-2); max-width: 580px; font-size: 14px; line-height: 1.5; }
-.result-card.is-hero .result-desc { font-size: 15px; }
 .result-avail-row { display: flex; gap: 6px 10px; flex-wrap: wrap; align-items: center; }
 .result-avail-row .sep { color: var(--line); margin: 0 4px; }
 .avail-lms-label { font-size: 11px; color: var(--ink-3); }
@@ -402,7 +380,6 @@ main[data-screen="results"] > .screen-finder {
   letter-spacing: 0.1em; text-transform: uppercase;
 }
 .result-why .tag { font-size: 10.5px; }
-.result-pct-col { text-align: right; }
 .result-card .btn { margin-top: 14px; font-size: 11px; padding: 8px 14px; }
 
 /* ─── Catalog ─────────────────────────────────────────────────── */
@@ -511,16 +488,8 @@ main[data-screen="results"] > .screen-finder {
   .brand-strip .left strong { display: none; }
 
 
-  .result-card {
-    grid-template-columns: 44px 1fr;
-    gap: 18px;
-    padding: 18px 20px;
-  }
-  .result-card.is-hero { padding: 22px 24px; }
-  .result-rank { font-size: 32px; }
-  .result-card.is-hero .result-rank { font-size: 40px; }
+  .result-card { padding: 18px 20px; }
   .result-name { font-size: 20px; }
-  .result-card.is-hero .result-name { font-size: 26px; }
 }
 
 @media (max-width: 640px) {
@@ -535,14 +504,7 @@ main[data-screen="results"] > .screen-finder {
 
   .results-head { flex-direction: column; align-items: stretch; }
 
-  .result-card,
-  .result-card.is-hero {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 18px;
-  }
-  .result-rank, .result-card.is-hero .result-rank { font-size: 28px; }
-  .result-top-pick { margin-top: 4px; }
+  .result-card { padding: 18px; }
 
   .catalog-toolbar { gap: 10px; }
   .catalog-search { flex: 1 1 100%; }
