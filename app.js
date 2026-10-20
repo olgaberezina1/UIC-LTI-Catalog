@@ -175,10 +175,6 @@
     return new Set(picked.flatMap(s => s.tools));
   }
 
-  function countTools(categoryName) {
-    return toolsInScope(categoryName, null).size;
-  }
-
   // Warn if the taxonomy names a tool the catalog no longer has — the two are
   // maintained separately, so they drift silently otherwise.
   function checkTaxonomy() {
@@ -203,11 +199,7 @@
       multi: false,
       // Three across: 11 categories in 4 rows rather than 6.
       columns: 3,
-      options: FINDER_TAXONOMY.map(cat => ({
-        v: cat.name,
-        t: cat.name,
-        s: `${countTools(cat.name)} ${countTools(cat.name) === 1 ? 'tool' : 'tools'}`,
-      })),
+      options: FINDER_TAXONOMY.map(cat => ({ v: cat.name, t: cat.name })),
     }];
 
     const subcategories = subcategoriesFor(state.answers.category);
@@ -218,11 +210,7 @@
         prompt: `Which part of ${state.answers.category}?`,
         multi: false,
         columns: 2,
-        options: subcategories.map(s => ({
-          v: s.name,
-          t: s.name,
-          s: `${s.tools.length} ${s.tools.length === 1 ? 'tool' : 'tools'}`,
-        })).concat([
+        options: subcategories.map(s => ({ v: s.name, t: s.name })).concat([
           { v: ANY_SUBCATEGORY, t: "No preference", s: "Show the whole category" },
         ]),
       });
@@ -355,7 +343,7 @@
                     data-selected="${selected}">
               <span class="body">
                 <div class="opt-title">${esc(opt.t)}</div>
-                <div class="opt-sub">${esc(opt.s)}</div>
+                ${opt.s ? `<div class="opt-sub">${esc(opt.s)}</div>` : ''}
               </span>
               ${selected ? `<span class="tick">${isMulti ? '✓' : '→'}</span>` : ''}
             </button>`;
