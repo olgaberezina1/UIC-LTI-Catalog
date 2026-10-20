@@ -30,9 +30,9 @@ dependencies.
 ## How it works
 
 `app.js` fetches `tools.json` when the page loads and renders the catalog
-table and the finder from it. Each tool carries a category from the sheet;
-the finder scores tools on that category, on the chosen LMS, and on Title II
-compliance, then shows the top three with runners-up.
+table and the finder from it. The finder asks for a category — and a
+sub-category where one applies — then scores the tools in that scope on Title II
+compliance and shows every match as a ranked card.
 
 ## Updating the catalog
 

@@ -87,14 +87,18 @@ Each tool is an object with these properties:
 
 ## Find My Tool
 
-The finder walks the user through 2 questions:
+The finder walks the user through 1 or 2 questions:
 
-1. **What do you want students to do?** (multi-select) — matched against each
-   tool's category via the `GOAL_CATEGORIES` map in `app.js`
-2. **Which LMS?** — Canvas or Blackboard
+1. **What do you want students to do?** — the 11 categories in
+   `FINDER_TAXONOMY` in `app.js`
+2. **Which part of it?** — the chosen category's sub-categories, shown only for
+   the 8 categories that have more than one
 
-Tools are scored against answers via `scoreTools()`. Title II compliance is always required (hardcoded `requireA11y = true`). Top 3
-results are shown as cards; additional matches appear as runners-up.
+Tools are scored against answers via `scoreTools()`: a tool matches when
+`FINDER_TAXONOMY` lists it in the chosen scope. Title II compliance is always
+required (hardcoded `requireA11y = true`). Availability is not scored, since the
+finder no longer asks which LMS you teach in. Every match gets a ranked card, so
+the tool count on an option card is exactly what the results screen delivers.
 
 There is no discipline question. The sheet's categories can't express
 discipline — its two health-sciences tools sit in categories holding 16 tools
