@@ -425,30 +425,23 @@
   }
 
   function renderResults() {
-    const results = scoreTools(state.answers);
-    const top = results.slice(0, 3);
-    const runners = results.slice(3, 6);
+    const ranked = scoreTools(state.answers);
+
+    // scoreTools ranks the whole catalog, so take only what the chosen scope
+    // holds — otherwise, once the scope runs out, unrelated tools fill the
+    // remaining slots and the count promised on the option card is a lie.
+    // Every match gets a card, so the count on the option card is what you see.
+    const inScope = toolsInScope(state.answers.category, state.answers.subcategory);
+    const matches = inScope.size ? ranked.filter(t => inScope.has(t.name)) : ranked.slice(0, 6);
+
+    document.getElementById('results-count').textContent =
+      `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
 
     document.getElementById('results-summary').innerHTML =
       `Built for <em>${esc(querySummary())}</em>.`;
 
     document.getElementById('results-top').innerHTML =
-      top.map((t, i) => resultCardMarkup(t, i + 1, i === 0)).join('');
-
-    const runnersWrap = document.getElementById('results-runners-wrap');
-    if (runners.length === 0) {
-      runnersWrap.style.display = 'none';
-    } else {
-      runnersWrap.style.display = '';
-      document.getElementById('results-runners').innerHTML = runners.map(t => `
-        <div class="runner-card">
-          <div class="runner-head">
-            <div class="runner-name">${esc(t.name)}</div>
-          </div>
-          <div class="runner-desc">${esc(t.desc.length > 110 ? t.desc.slice(0, 110) + '…' : t.desc)}</div>
-        </div>
-      `).join('');
-    }
+      matches.map((t, i) => resultCardMarkup(t, i + 1, i === 0)).join('');
   }
 
   function rowsForCatalog() {
