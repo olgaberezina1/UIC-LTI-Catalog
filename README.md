@@ -3,7 +3,7 @@
 A static website listing every LTI tool and app approved for teaching at the
 University of Illinois Chicago, with availability in Canvas and Blackboard and
 Title II compliance at a glance. Instructors can answer two questions in
-**Find My Tool** for ranked recommendations, or search and filter the full
+**Find My Tool** for a shortlist by category, or search and filter the full
 catalog table.
 
 **Live site:** https://olgaberezina1.github.io/UIC-LTI-Catalog
@@ -31,8 +31,8 @@ dependencies.
 
 `app.js` fetches `tools.json` when the page loads and renders the catalog
 table and the finder from it. The finder asks for a category — and a
-sub-category where one applies — then scores the tools in that scope on Title II
-compliance and shows every match as a ranked card.
+sub-category where one applies — then lists every tool in that scope as a card,
+alphabetically and unranked.
 
 ## Updating the catalog
 

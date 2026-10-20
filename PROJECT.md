@@ -94,11 +94,12 @@ The finder walks the user through 1 or 2 questions:
 2. **Which part of it?** — the chosen category's sub-categories, shown only for
    the 8 categories that have more than one
 
-Tools are scored against answers via `scoreTools()`: a tool matches when
-`FINDER_TAXONOMY` lists it in the chosen scope. Title II compliance is always
-required (hardcoded `requireA11y = true`). Availability is not scored, since the
-finder no longer asks which LMS you teach in. Every match gets a ranked card, so
-the tool count on an option card is exactly what the results screen delivers.
+`matchTools()` returns the tools `FINDER_TAXONOMY` lists in the chosen scope.
+**Results are not ranked** — every tool in the scope is an equally valid answer,
+so they are listed alphabetically with no top pick, no rank numbers and no
+percentage. Title II status and Canvas/Blackboard availability appear on every
+card but do not order them; the catalog has its own filters for narrowing on
+either.
 
 There is no discipline question. The sheet's categories can't express
 discipline — its two health-sciences tools sit in categories holding 16 tools
@@ -189,7 +190,7 @@ it. `tools.json` needs no stamp — `app.js` fetches it with `cache: 'no-cache'`
 
 ## Key Design Decisions
 
-- **Title II always required** — the finder hardcodes `requireA11y = true`; there is no question for it
+- **The finder does not rank** — it answers "what is there?", not "which is best?". Title II and availability are shown on each card and left to the reader to weigh
 - **The sheet is the source of truth** — `tools.json` is generated; the repo
   holds no hand-maintained tool data
 - **Unpublished rows are filtered at sync time** — a row is dropped when its
