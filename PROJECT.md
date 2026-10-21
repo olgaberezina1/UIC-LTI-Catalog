@@ -2,7 +2,7 @@
 
 ## Overview
 
-A static website listing all LTI tools and apps approved for use at the University of Illinois Chicago (UIC). Instructors can use the **Find My Tool** guided finder to get personalized recommendations, or browse the full catalog table directly.
+A static website listing all LTI tools and apps approved for use at the University of Illinois Chicago (UIC). Instructors can use the **Find My Match** guided finder to get personalized recommendations, or browse the full catalog table directly.
 
 **Live site:** https://olgaberezina1.github.io/UIC-LTI-Catalog
 **GitHub repo:** https://github.com/olgaberezina1/UIC-LTI-Catalog
@@ -41,7 +41,7 @@ Everything runs inside a single IIFE in `app.js`. There are three main screens:
 | Screen | ID | Shown when |
 |---|---|---|
 | Hero | `screen-hero` | Page load |
-| Finder | `screen-finder` | User clicks "Find My Tool →" |
+| Finder | `screen-finder` | User clicks "Find My Match →" |
 | Results | `screen-results` | User completes the finder |
 | Catalog | `catalog` | Always visible below |
 
@@ -85,7 +85,7 @@ Each tool is an object with these properties:
 
 ---
 
-## Find My Tool
+## Find My Match
 
 The finder walks the user through 1 or 2 questions:
 
@@ -144,7 +144,7 @@ between them — so the question was removed rather than answered badly.
 
 ## Hero Section
 
-- **Find My Tool →** button launches the finder
+- **Find My Match →** button launches the finder
 - **Browse all** button scrolls to the catalog
 - Below the buttons: "Can't find the tool you're looking for? [Request an LTI here!](https://learning.uic.edu/services/lti-integration-and-development/lti-requests/)"
 

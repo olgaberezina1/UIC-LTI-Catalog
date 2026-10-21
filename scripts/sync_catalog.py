@@ -179,7 +179,7 @@ def build_catalog(rows):
 def taxonomy_tool_names(path=None):
     """The tool names listed in app.js's FINDER_TAXONOMY.
 
-    Find My Tool's category tree is hand-maintained JavaScript, not generated
+    Find My Match's category tree is hand-maintained JavaScript, not generated
     from the sheet, so the two can drift apart. Rather than teach this script to
     parse JavaScript, lift the names with a regex: every entry sits in a
     `tools: [...]` array of double-quoted strings.
@@ -231,7 +231,7 @@ def check_taxonomy(tools, taxonomy_names):
 
     return [
         f"{name}: in the catalog but absent from FINDER_TAXONOMY in app.js — "
-        "Find My Tool cannot reach it"
+        "Find My Match cannot reach it"
         for name in sorted(catalog - taxonomy_names)
     ]
 
