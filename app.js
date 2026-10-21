@@ -514,7 +514,6 @@
           </td>
           <td class="catalog-desc" data-label="What it's for">${esc(t.desc)}${videoLink}</td>
           <td data-label="Canvas">${availMarkup(t.cv)}</td>
-          <td data-label="Blackboard">${availMarkup(t.bb)}</td>
           <td data-label="Title II">${t2cell}</td>
         </tr>
       `;
@@ -683,7 +682,7 @@
     } catch (err) {
       console.error('Could not load tools.json', err);
       document.getElementById('catalog-tbody').innerHTML =
-        '<tr><td colspan="5">Catalog failed to load. Please refresh the page.</td></tr>';
+        '<tr><td colspan="4">Catalog failed to load. Please refresh the page.</td></tr>';
       return;
     }
 

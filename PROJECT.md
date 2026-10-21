@@ -112,9 +112,8 @@ built in, so it behaves like an integration.
 
 **Results are not ranked** — every tool in the scope is an equally valid answer,
 so they are listed alphabetically with no top pick, no rank numbers and no
-percentage. Title II status and Canvas/Blackboard availability appear on every
-card but do not order them; the catalog has its own filters for narrowing on
-either.
+percentage. Each card shows the tool's Title II status, which does not order
+them either.
 
 There is no discipline question. The sheet's categories can't express
 discipline — its two health-sciences tools sit in categories holding 16 tools
@@ -127,7 +126,7 @@ between them — so the question was removed rather than answered badly.
 - Searchable by keyword
 - Filterable by platform (Canvas / Blackboard / All)
 - Filterable by Title II compliance
-- Columns: Tool | What it's for | Canvas | Blackboard | Title II
+- Columns: Tool | What it's for | Canvas | Title II
 - Tools with a `video` property show a walkthrough link below the description — the label comes from `videoTitle` if present, or falls back to "Watch walkthrough"
 
 ---

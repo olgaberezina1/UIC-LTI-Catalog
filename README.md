@@ -1,8 +1,8 @@
 # UIC LTI Catalog
 
 A static website listing every LTI tool and app approved for teaching at the
-University of Illinois Chicago, with availability in Canvas and Blackboard and
-Title II compliance at a glance. Instructors can answer two questions in
+University of Illinois Chicago, with Canvas availability and Title II
+compliance at a glance. Instructors can answer two questions in
 **Find My Match** for a shortlist by category, or search and filter the full
 catalog table.
 
