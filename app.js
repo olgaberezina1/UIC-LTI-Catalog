@@ -322,7 +322,6 @@
     },
     catalog: {
       search: '',
-      lms: 'all',
       onlyA11y: false,
       page: 0,
     },
@@ -467,7 +466,6 @@
     const q = c.search.trim().toLowerCase();
     return LTI_TOOLS.filter(t => {
       if (q && !((t.name + ' ' + t.desc).toLowerCase().includes(q))) return false;
-      if (c.lms === 'canvas' && t.cv !== 'yes') return false;
       if (c.onlyA11y && t.t2 !== 'yes') return false;
       return true;
     });
@@ -484,11 +482,6 @@
 
     document.getElementById('catalog-count').textContent =
       `${rows.length} OF ${LTI_TOOLS.length} SHOWN`;
-
-    // Filter pills
-    document.querySelectorAll('#catalog-pills .tag').forEach(btn => {
-      btn.classList.toggle('is-on', btn.dataset.lms === state.catalog.lms);
-    });
 
     // Title II checkbox — keep both the visual square and the real <input> in sync.
     const box = document.getElementById('catalog-a11y-box');
@@ -734,16 +727,6 @@
 
     document.getElementById('catalog-search-input').addEventListener('input', (e) => {
       state.catalog.search = e.target.value;
-      state.catalog.page = 0;
-      renderCatalog();
-    });
-
-    document.getElementById('catalog-pills').addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-lms]');
-      if (!btn) return;
-      // The pills toggle rather than select. With "All platforms" gone there is
-      // no pill to return to, so clicking the active one clears the filter.
-      state.catalog.lms = state.catalog.lms === btn.dataset.lms ? 'all' : btn.dataset.lms;
       state.catalog.page = 0;
       renderCatalog();
     });

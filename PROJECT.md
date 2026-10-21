@@ -124,7 +124,6 @@ between them — so the question was removed rather than answered badly.
 ## Catalog Table
 
 - Searchable by keyword
-- Filterable to Canvas-available tools only (a toggle; off shows everything)
 - Filterable by Title II compliance
 - Columns: Tool | What it's for | Canvas | Title II
 - Tools with a `video` property show a walkthrough link below the description — the label comes from `videoTitle` if present, or falls back to "Watch walkthrough"

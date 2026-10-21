@@ -111,7 +111,6 @@ main[data-screen="results"] > .screen-finder {
   text-transform: uppercase;
   font-weight: 500;
 }
-.tag.is-on { background: var(--ink); color: white; border-color: var(--ink); }
 
 /* Buttons */
 .btn {
@@ -406,8 +405,6 @@ main[data-screen="results"] > .screen-finder {
   position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
   color: var(--ink-3); font-size: 12px;
 }
-.catalog-pills { display: flex; gap: 6px; }
-.catalog-pills .tag { font-size: 11px; }
 .catalog-a11y { display: flex; align-items: center; gap: 8px; margin-left: auto; cursor: pointer; }
 .catalog-checkbox {
   width: 14px; height: 14px;
