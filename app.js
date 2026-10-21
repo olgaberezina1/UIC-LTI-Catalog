@@ -412,8 +412,6 @@
         <div class="result-avail-row">
           <span class="avail-lms-label">Canvas</span>${availMarkup(t.cv)}
           <span class="sep">·</span>
-          <span class="avail-lms-label">Blackboard</span>${availMarkup(t.bb)}
-          <span class="sep">·</span>
           <span class="result-t2">Title II: <strong>${t.t2 === 'yes' ? 'Compliant' : t.t2 === 'no' ? 'No' : '—'}</strong></span>
         </div>
         ${(t.reasons && t.reasons.length) ? `
