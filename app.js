@@ -406,7 +406,6 @@
     btnContinue.disabled = !canContinue;
     btnContinue.textContent = isLast ? 'See my matches →' : 'Continue →';
 
-    document.getElementById('btn-back').disabled = state.step === 0;
 
   }
 
@@ -708,7 +707,12 @@
     });
 
     document.getElementById('btn-back').addEventListener('click', () => {
+      // From the first question there is no earlier step, so Back leaves the
+      // finder for the hero it was launched from. Answers are kept, so
+      // re-entering resumes where you were rather than starting over — that is
+      // what "Start over" is for.
       if (state.step > 0) goToStep(state.step - 1);
+      else goToScreen('hero');
     });
 
     document.getElementById('btn-continue').addEventListener('click', () => {

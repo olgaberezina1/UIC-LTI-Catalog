@@ -333,7 +333,6 @@ main[data-screen="results"] > .screen-finder {
   font-size: 13px;
   letter-spacing: 0.04em;
 }
-.finder-back:disabled { color: var(--line); cursor: default; }
 .auto-hint { font-size: 12px; color: var(--ink-3); }
 
 /* ─── Results ─────────────────────────────────────────────────── */
