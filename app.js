@@ -154,15 +154,29 @@
   // A real value, not null, so "no preference" stays distinct from "unanswered".
   const ANY_SUBCATEGORY = "__any__";
 
-  // The finder only offers tools available in Canvas. Blackboard-only tools —
-  // and anything still pending, retired or unlicensed there — are left to the
-  // catalog, which lists every tool and has its own LMS filter. Rebuilt after
-  // the catalog loads, since availability comes from tools.json.
+  // Catalog entries that are not LTI integrations — Canvas's own built-in
+  // features. The sheet lists them and the catalog shows them, because
+  // instructors do look them up, but the finder answers "which integration do I
+  // add to my course?", and there is nothing to add for these.
+  const NOT_LTI = new Set([
+    "Canvas Attendance",            // Canvas's built-in Roll Call
+    "Canvas Intelligent Insights",  // Canvas's own analytics
+    "Canvas Moderated Grading",     // Canvas instructor/admin roles
+  ]);
+  // Canvas Studio is deliberately NOT here: it is a separately licensed Canvas
+  // product rather than a built-in feature, so it behaves like an integration.
+
+  // The finder only offers LTI integrations available in Canvas. Blackboard-only
+  // tools — and anything still pending, retired or unlicensed there — are left
+  // to the catalog, which lists every tool and has its own LMS filter. Rebuilt
+  // after the catalog loads, since availability comes from tools.json.
   let offerableTools = new Set();
 
   function buildOfferable() {
     offerableTools = new Set(
-      LTI_TOOLS.filter(tool => tool.cv === "yes").map(tool => tool.name));
+      LTI_TOOLS
+        .filter(tool => tool.cv === "yes" && !NOT_LTI.has(tool.name))
+        .map(tool => tool.name));
   }
 
   function categoryByName(name) {

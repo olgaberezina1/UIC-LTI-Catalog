@@ -95,11 +95,17 @@ The finder walks the user through 1 or 2 questions:
    the 8 categories that have more than one
 
 `matchTools()` returns the tools `FINDER_TAXONOMY` lists in the chosen scope,
-restricted to those **available in Canvas** (`cv: "yes"`). Blackboard-only
-tools, and anything still pending, retired or unlicensed in Canvas, never reach
+restricted to those **available in Canvas** (`cv: "yes"`) and not listed in
+`NOT_LTI`. Blackboard-only tools, anything still pending, retired or unlicensed
+in Canvas, and catalog entries that aren't LTI integrations at all never reach
 the finder — a sub-category left with nothing drops its option, and so does a
-category. Today that costs 12 of the 60 tools and removes one sub-category,
+category. Today that costs 15 of the 60 tools and removes one sub-category,
 *Access & Compliance / Computing Access*.
+
+`NOT_LTI` holds Canvas's built-in features — **Canvas Attendance** (Roll Call),
+**Canvas Intelligent Insights** and **Canvas Moderated Grading**. **Canvas
+Studio** is deliberately not among them: it is separately licensed rather than
+built in, so it behaves like an integration.
 
 **Results are not ranked** — every tool in the scope is an equally valid answer,
 so they are listed alphabetically with no top pick, no rank numbers and no

@@ -32,8 +32,9 @@ dependencies.
 `app.js` fetches `tools.json` when the page loads and renders the catalog
 table and the finder from it. The finder asks for a category — and a
 sub-category where one applies — then lists the tools in that scope as cards,
-alphabetically and unranked. Only tools available in Canvas are offered;
-Blackboard-only tools are left to the catalog, which lists everything.
+alphabetically and unranked. Only LTI integrations available in Canvas are
+offered; Blackboard-only tools, and catalog entries that aren't integrations,
+are left to the catalog, which lists everything.
 
 ## Updating the catalog
 
