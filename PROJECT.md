@@ -94,7 +94,13 @@ The finder walks the user through 1 or 2 questions:
 2. **Which part of it?** — the chosen category's sub-categories, shown only for
    the 8 categories that have more than one
 
-`matchTools()` returns the tools `FINDER_TAXONOMY` lists in the chosen scope.
+`matchTools()` returns the tools `FINDER_TAXONOMY` lists in the chosen scope,
+restricted to those **available in Canvas** (`cv: "yes"`). Blackboard-only
+tools, and anything still pending, retired or unlicensed in Canvas, never reach
+the finder — a sub-category left with nothing drops its option, and so does a
+category. Today that costs 12 of the 60 tools and removes one sub-category,
+*Access & Compliance / Computing Access*.
+
 **Results are not ranked** — every tool in the scope is an equally valid answer,
 so they are listed alphabetically with no top pick, no rank numbers and no
 percentage. Title II status and Canvas/Blackboard availability appear on every
@@ -190,6 +196,8 @@ it. `tools.json` needs no stamp — `app.js` fetches it with `cache: 'no-cache'`
 
 ## Key Design Decisions
 
+- **The finder is Canvas-only** — it offers tools with `cv: "yes"`; the catalog
+  remains the complete list, with its own LMS filter for Blackboard
 - **The finder does not rank** — it answers "what is there?", not "which is best?". Title II and availability are shown on each card and left to the reader to weigh
 - **The sheet is the source of truth** — `tools.json` is generated; the repo
   holds no hand-maintained tool data

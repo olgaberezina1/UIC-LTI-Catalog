@@ -154,15 +154,30 @@
   // A real value, not null, so "no preference" stays distinct from "unanswered".
   const ANY_SUBCATEGORY = "__any__";
 
+  // The finder only offers tools available in Canvas. Blackboard-only tools —
+  // and anything still pending, retired or unlicensed there — are left to the
+  // catalog, which lists every tool and has its own LMS filter. Rebuilt after
+  // the catalog loads, since availability comes from tools.json.
+  let offerableTools = new Set();
+
+  function buildOfferable() {
+    offerableTools = new Set(
+      LTI_TOOLS.filter(tool => tool.cv === "yes").map(tool => tool.name));
+  }
+
   function categoryByName(name) {
     return FINDER_TAXONOMY.find(c => c.name === name) || null;
   }
 
-  // The sub-category question applies only where a category has more than one.
-  // Three categories have a single sub-category, which would be a dead step.
+  // The sub-category question applies only where a category has more than one
+  // sub-category with something to offer. A single one would be a dead step, and
+  // a sub-category whose tools are all Blackboard-only has nothing behind it.
   function subcategoriesFor(categoryName) {
     const cat = categoryByName(categoryName);
-    return cat && cat.subcategories.length > 1 ? cat.subcategories : [];
+    if (!cat) return [];
+    const live = cat.subcategories.filter(
+      sub => sub.tools.some(name => offerableTools.has(name)));
+    return live.length > 1 ? live : [];
   }
 
   // The tools in the narrowest scope chosen so far.
@@ -172,7 +187,7 @@
     const picked = (subcategoryName && subcategoryName !== ANY_SUBCATEGORY)
       ? cat.subcategories.filter(s => s.name === subcategoryName)
       : cat.subcategories;
-    return new Set(picked.flatMap(s => s.tools));
+    return new Set(picked.flatMap(s => s.tools).filter(name => offerableTools.has(name)));
   }
 
   // Warn if the taxonomy names a tool the catalog no longer has — the two are
@@ -199,7 +214,9 @@
       multi: false,
       // Three across: 11 categories in 4 rows rather than 6.
       columns: 3,
-      options: FINDER_TAXONOMY.map(cat => ({ v: cat.name, t: cat.name })),
+      options: FINDER_TAXONOMY
+        .filter(cat => toolsInScope(cat.name, null).size)
+        .map(cat => ({ v: cat.name, t: cat.name })),
     }];
 
     const subcategories = subcategoriesFor(state.answers.category);
@@ -634,6 +651,9 @@
 
     // The taxonomy and the catalog are maintained separately; say so if they drift.
     checkTaxonomy();
+
+    // Which tools the finder may offer depends on catalog availability.
+    buildOfferable();
 
     // Populate hero count from data
     document.getElementById('hero-count').textContent =
