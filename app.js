@@ -468,7 +468,6 @@
     return LTI_TOOLS.filter(t => {
       if (q && !((t.name + ' ' + t.desc).toLowerCase().includes(q))) return false;
       if (c.lms === 'canvas' && t.cv !== 'yes') return false;
-      if (c.lms === 'blackboard' && t.bb !== 'yes') return false;
       if (c.onlyA11y && t.t2 !== 'yes') return false;
       return true;
     });
