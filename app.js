@@ -741,7 +741,9 @@
     document.getElementById('catalog-pills').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-lms]');
       if (!btn) return;
-      state.catalog.lms = btn.dataset.lms;
+      // The pills toggle rather than select. With "All platforms" gone there is
+      // no pill to return to, so clicking the active one clears the filter.
+      state.catalog.lms = state.catalog.lms === btn.dataset.lms ? 'all' : btn.dataset.lms;
       state.catalog.page = 0;
       renderCatalog();
     });
