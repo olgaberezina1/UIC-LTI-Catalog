@@ -183,15 +183,20 @@
     return FINDER_TAXONOMY.find(c => c.name === name) || null;
   }
 
-  // The sub-category question applies only where a category has more than one
-  // sub-category with something to offer. A single one would be a dead step, and
-  // a sub-category whose tools are all Blackboard-only has nothing behind it.
+  // The sub-category question applies wherever a category has a sub-category
+  // with something to offer — including a lone one, which still names the kind
+  // of tool the category holds. A sub-category whose tools are all unavailable
+  // in Canvas has nothing behind it and is left out.
+  //
+  // The one exception: a lone sub-category named after its own category narrows
+  // nothing ("Which part of Accessibility?" / "Accessibility"), so it is skipped.
   function subcategoriesFor(categoryName) {
     const cat = categoryByName(categoryName);
     if (!cat) return [];
     const live = cat.subcategories.filter(
       sub => sub.tools.some(name => offerableTools.has(name)));
-    return live.length > 1 ? live : [];
+    if (live.length === 1 && live[0].name === cat.name) return [];
+    return live;
   }
 
   // The tools in the narrowest scope chosen so far.
@@ -241,9 +246,12 @@
         prompt: `Which part of ${state.answers.category}?`,
         multi: false,
         columns: 2,
-        options: subcategories.map(s => ({ v: s.name, t: s.name })).concat([
-          { v: ANY_SUBCATEGORY, t: "No preference", s: "Show the whole category" },
-        ]),
+        // "No preference" only earns its place when there is a choice to decline;
+        // with a single sub-category it would just duplicate that option.
+        options: subcategories.map(s => ({ v: s.name, t: s.name })).concat(
+          subcategories.length > 1
+            ? [{ v: ANY_SUBCATEGORY, t: "No preference", s: "Show the whole category" }]
+            : []),
       });
     }
 

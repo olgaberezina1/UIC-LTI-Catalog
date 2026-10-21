@@ -91,8 +91,11 @@ The finder walks the user through 1 or 2 questions:
 
 1. **What do you want students to do?** — the 11 categories in
    `FINDER_TAXONOMY` in `app.js`
-2. **Which part of it?** — the chosen category's sub-categories, shown only for
-   the 8 categories that have more than one
+2. **Which part of it?** — the chosen category's sub-categories, asked for 10 of
+   the 11 categories. A sub-category with nothing left after filtering is left
+   out, and the question is skipped entirely when a category's only remaining
+   sub-category shares its name (Accessibility), since that narrows nothing.
+   "No preference" is offered only where there is more than one to choose from
 
 `matchTools()` returns the tools `FINDER_TAXONOMY` lists in the chosen scope,
 restricted to those **available in Canvas** (`cv: "yes"`) and not listed in
