@@ -166,16 +166,36 @@
   // Canvas Studio is deliberately NOT here: it is a separately licensed Canvas
   // product rather than a built-in feature, so it behaves like an integration.
 
-  // The finder only offers LTI integrations available in Canvas. Blackboard-only
-  // tools — and anything still pending, retired or unlicensed there — are left
-  // to the catalog, which lists every tool and has its own LMS filter. Rebuilt
-  // after the catalog loads, since availability comes from tools.json.
+  // Statuses that mean "this question doesn't apply" rather than "not available":
+  // a blank cell, and the sheet's explicit N/A.
+  const AVAILABILITY_NA = new Set(["—", "na"]);
+
+  // A tool qualifies for the finder if Canvas has it — or if neither LMS column
+  // answers the availability question at all, which marks something that isn't an
+  // LMS integration. The campus Virtual Machine is reached outside any LMS, so
+  // judging it by a Canvas column would wrongly hide it, and it was never
+  // Blackboard-only either. Anything with a real Canvas answer of no, pending,
+  // retired, request or unlicensed is left to the catalog, which lists every tool
+  // and has its own LMS filter.
+  //
+  // Today the second branch admits only the Virtual Machine, but it is written as
+  // a rule so anything later recorded the same way is included without a code
+  // change. Both columns must be unanswered: Blackboard "yes" with Canvas blank
+  // is a Blackboard tool whose Canvas status nobody has filled in yet, which is
+  // not the same thing. Only tools somebody placed in FINDER_TAXONOMY by hand
+  // reach this test, so a half-filled sheet row cannot slip in on its own.
+  function availableForFinder(tool) {
+    return tool.cv === "yes"
+      || (AVAILABILITY_NA.has(tool.cv) && AVAILABILITY_NA.has(tool.bb));
+  }
+
+  // Rebuilt after the catalog loads, since availability comes from tools.json.
   let offerableTools = new Set();
 
   function buildOfferable() {
     offerableTools = new Set(
       LTI_TOOLS
-        .filter(tool => tool.cv === "yes" && !NOT_LTI.has(tool.name))
+        .filter(tool => !NOT_LTI.has(tool.name) && availableForFinder(tool))
         .map(tool => tool.name));
   }
 
